@@ -1,0 +1,24 @@
+<h2 class="text-center text-3xl font-bold">Конструктор расписания</h2>
+
+<form id="schedule-form" class="bg-white p-6 rounded shadow-md mt-6">
+    <div class="mb-4">
+        <label for="start-time" class="block text-gray-700 font-bold mb-2">Время начала:</label>
+        <input type="time" id="start-time" name="start-time" class="w-full border border-gray-300 rounded px-4 py-2">
+    </div>
+
+    <div class="mb-4">
+        <label for="end-time" class="block text-gray-700 font-bold mb-2">Время окончания:</label>
+        <input type="time" id="end-time" name="end-time" class="w-full border border-gray-300 rounded px-4 py-2">
+    </div>
+
+    <div class="mb-4">
+        <label for="max-movies" class="block text-gray-700 font-bold mb-2">Количество фильмов:</label>
+        <input type="number" id="max-movies" name="max-movies" class="w-full border border-gray-300 rounded px-4 py-2" min="1">
+    </div>
+
+    <div class="flex justify-end">
+        <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded">Создать расписание</button>
+    </div>
+</form>
+
+<div id="schedule-output" class="mt-6 bg-white p-6 rounded shadow-md"></div>
