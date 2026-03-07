@@ -31,8 +31,7 @@ export class AppController {
       title: 'Главная', 
       films, 
       schedule, 
-      user,
-      useSwiper: true
+      user
     };
   }
 

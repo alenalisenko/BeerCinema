@@ -1,0 +1,59 @@
+/* Swiper container */
+.swiper-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px 60px;
+    position: relative;
+    overflow: visible;
+}
+
+.swiper-slide {
+    height: auto;
+}
+
+/* Swiper buttons */
+.swiper-button-next,
+.swiper-button-prev {
+    color: #facc15 !important;
+    background: rgba(255, 255, 255, 0.9);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+}
+
+.swiper-pagination-bullet-active {
+    background: #facc15 !important;
+    width: 24px;
+    border-radius: 5px;
+}
+
+/* Стили для меню */
+.menu-link {
+    transition: all 0.3s ease;
+}
+
+.menu-link:hover {
+    transform: translateY(-2px);
+}
+
+/* Кнопки */
+button {
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
