@@ -1,29 +1,37 @@
 import { Controller, Get, Query, Render } from '@nestjs/common';
+import { FilmsService } from './films/films.service';
+import { SessionsService } from './sessions/sessions.service';
 
 @Controller()
 export class AppController {
+  constructor(
+    private filmsService: FilmsService,
+    private sessionsService: SessionsService,
+  ) {}
+
   @Get()
   @Render('index')
-  getIndex(@Query('auth') auth?: string) {
-    const films = [
-      { title: '100 лет тому вперед', time: '12:00', image: '100years.png' },
-      { title: 'Серебряные коньки', time: '12:50', image: 'silver.png' },
-      { title: 'Каскадеры', time: '12:55', image: 'kaskader.png' },
-      { title: 'Головоломка 2', time: '13:00', image: 'insideout.png' },
-      { title: 'Брат 2', time: '13:50', image: 'brat.png' },
-      { title: 'Леон', time: '14:00', image: 'leon.png' },
-      { title: '12 друзей Оушена', time: '14:30', image: 'friends.png' },
-    ];
+  async getIndex(@Query('auth') auth?: string) {
+    // Получаем фильмы с сеансами из БД
+    const filmsFromDB = await this.filmsService.findAll();
+    
+    // Форматируем для отображения
+    const films = filmsFromDB.map(film => {
+      const firstSession = film.sessions[0];
+      return {
+        title: film.title,
+        time: firstSession ? this.formatTime(firstSession.startTime) : '',
+        image: film.posterUrl.replace('/assets/images/', ''),
+      };
+    });
 
-    const schedule = [
-      { film: '100 лет тому вперед', time: '12:00', hall: 'ЗОЖ' },
-      { film: 'Брат', time: '12:15', hall: 'Балтика' },
-      { film: '12 друзей Оушена', time: '12:45', hall: 'Разливное пиво' },
-      { film: 'Головоломка', time: '14:05', hall: 'ЗОЖ' },
-      { film: 'Каскадеры', time: '14:30', hall: 'Балтика' },
-      { film: 'Леон', time: '14:50', hall: 'Разливное пиво' },
-      { film: 'Серебряные коньки', time: '16:00', hall: 'ЗОЖ' },
-    ];
+    // Получаем расписание на сегодня
+    const sessions = await this.sessionsService.findByDate(new Date());
+    const schedule = sessions.map(session => ({
+      film: session.film.title,
+      time: this.formatTime(session.startTime),
+      hall: session.hall.name,
+    }));
 
     const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
 
@@ -37,21 +45,36 @@ export class AppController {
 
   @Get('films')
   @Render('films')
-  getFilms(@Query('auth') auth?: string) {
+  async getFilms(@Query('auth') auth?: string) {
     const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
+    const films = await this.filmsService.findAll();
+    
     return { 
       title: 'Фильмы', 
       user,
-      useSwiper: true,
+      films,
       useComments: true
     };
   }
 
   @Get('sessions')
   @Render('sessions')
-  getSessions(@Query('auth') auth?: string) {
+  async getSessions(@Query('auth') auth?: string) {
     const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
-    return { title: 'Сеансы', user };
+    const sessions = await this.sessionsService.findAll();
+    
+    return { 
+      title: 'Сеансы', 
+      user,
+      sessions
+    };
+  }
+
+  private formatTime(date: Date): string {
+    return new Date(date).toLocaleTimeString('ru-RU', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   @Get('about')

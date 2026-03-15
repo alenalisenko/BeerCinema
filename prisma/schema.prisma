@@ -1,0 +1,132 @@
+// BeerCinema - Доменная модель системы управления кинотеатром
+// Автор: Лисенко Алёна M3308
+// Дата: Март 2026
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =====================================================
+// СУЩНОСТИ (ENTITIES)
+// =====================================================
+
+// 1. User - Пользователи системы (клиенты, админы, менеджеры)
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  password  String
+  role      Role     @default(CLIENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Связи
+  tickets   Ticket[]
+  reviews   Review[]
+}
+
+enum Role {
+  CLIENT    // Обычный пользователь
+  ADMIN     // Администратор системы
+  MANAGER   // Менеджер кинотеатра
+}
+
+// 2. Film - Фильмы в прокате
+model Film {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String   @db.Text
+  duration    Int      // Длительность в минутах
+  genre       String
+  posterUrl   String   // URL постера фильма
+  releaseYear Int
+  rating      Float?   // Средний рейтинг (1.0-5.0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Связи
+  sessions    Session[]
+  reviews     Review[]
+}
+
+// 3. Hall - Кинозалы
+model Hall {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique  // Например: "ЗОЖ", "Балтика", "Разливное пиво"
+  capacity    Int      // Вместимость зала
+  description String?  // Описание особенностей зала
+  createdAt   DateTime @default(now())
+  
+  // Связи
+  sessions    Session[]
+}
+
+// 4. Session - Киносеансы (показы фильмов)
+model Session {
+  id        Int      @id @default(autoincrement())
+  filmId    Int
+  hallId    Int
+  startTime DateTime
+  endTime   DateTime
+  price     Float    // Цена билета на сеанс
+  createdAt DateTime @default(now())
+  
+  // Связи
+  film      Film     @relation(fields: [filmId], references: [id], onDelete: Cascade)
+  hall      Hall     @relation(fields: [hallId], references: [id], onDelete: Restrict)
+  tickets   Ticket[]
+  
+  // Индексы для оптимизации запросов
+  @@index([filmId])
+  @@index([hallId])
+  @@index([startTime])
+}
+
+// 5. Ticket - Билеты на сеансы
+model Ticket {
+  id        Int          @id @default(autoincrement())
+  sessionId Int
+  userId    Int
+  seat      String       // Номер места (например: "A1", "B12")
+  status    TicketStatus @default(RESERVED)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  
+  // Связи
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Уникальное ограничение: одно место не может быть забронировано дважды на один сеанс
+  @@unique([sessionId, seat])
+  @@index([userId])
+}
+
+enum TicketStatus {
+  RESERVED   // Забронирован
+  PAID       // Оплачен
+  CANCELLED  // Отменен
+}
+
+// 6. Review - Отзывы на фильмы
+model Review {
+  id        Int      @id @default(autoincrement())
+  filmId    Int
+  userId    Int
+  rating    Int      // Оценка от 1 до 5
+  comment   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Связи
+  film      Film     @relation(fields: [filmId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Индексы
+  @@index([filmId])
+  @@index([userId])
+}

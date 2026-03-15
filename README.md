@@ -1,98 +1,320 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🎬 BeerCinema - Система управления кинотеатром
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**Автор:** Лисенко Алёна, M3308  
+**Репозиторий:** https://github.com/is-web-y27/m3308-lisenko-backend  
+**Деплой:** https://m3308-lisenko-backend.onrender.com
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## 📖 Описание проекта
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+BeerCinema - это веб-приложение для управления кинотеатром, реализованное на NestJS с использованием PostgreSQL и Prisma ORM. Система позволяет управлять фильмами, залами, сеансами, билетами и отзывами.
 
-## Project setup
+---
 
-```bash
-$ npm install
+## 🎯 Доменная область
+
+### Предметная область: Система управления кинотеатром
+
+BeerCinema - это сеть кинотеатров с уникальной концепцией: каждый зал имеет тематическое название и атмосферу. Система автоматизирует процессы бронирования билетов, управления расписанием сеансов и сбора отзывов от посетителей.
+
+### Ключевые бизнес-процессы:
+
+1. **Управление репертуаром** - добавление и редактирование информации о фильмах
+2. **Планирование сеансов** - создание расписания показов в разных залах
+3. **Бронирование билетов** - резервирование и оплата мест на сеансы
+4. **Система отзывов** - сбор и модерация отзывов от зрителей
+5. **Управление пользователями** - учет клиентов и сотрудников
+
+---
+
+## 📊 Доменная модель (Entities)
+
+### 1. 👤 User - Пользователи системы
+
+Представляет пользователей системы: клиентов кинотеатра, менеджеров и администраторов.
+
+**Атрибуты:**
+- `id` - уникальный идентификатор
+- `email` - email (уникальный)
+- `name` - имя пользователя
+- `password` - хэш пароля
+- `role` - роль (CLIENT, ADMIN, MANAGER)
+- `createdAt` - дата регистрации
+- `updatedAt` - дата последнего обновления
+
+**Связи:**
+- Один пользователь может иметь **много билетов** (1:N)
+- Один пользователь может написать **много отзывов** (1:N)
+
+### 2. 🎬 Film - Фильмы
+
+Информация о фильмах в прокате кинотеатра.
+
+**Атрибуты:**
+- `id` - уникальный идентификатор
+- `title` - название фильма
+- `description` - описание сюжета
+- `duration` - длительность в минутах
+- `genre` - жанр
+- `posterUrl` - URL постера
+- `releaseYear` - год выпуска
+- `rating` - средний рейтинг (1.0-5.0)
+- `createdAt` - дата добавления
+- `updatedAt` - дата последнего обновления
+
+**Связи:**
+- Один фильм может иметь **много сеансов** (1:N)
+- Один фильм может иметь **много отзывов** (1:N)
+
+### 3. 🏛️ Hall - Кинозалы
+
+Физические залы для показа фильмов.
+
+**Атрибуты:**
+- `id` - уникальный идентификатор
+- `name` - название зала (уникальное) - "ЗОЖ", "Балтика", "Разливное пиво"
+- `capacity` - вместимость (количество мест)
+- `description` - описание особенностей зала
+- `createdAt` - дата создания
+
+**Связи:**
+- Один зал может принимать **много сеансов** (1:N)
+
+### 4. 🎫 Session - Киносеансы
+
+Конкретный показ фильма в определенном зале в определенное время.
+
+**Атрибуты:**
+- `id` - уникальный идентификатор
+- `filmId` - ID фильма (foreign key)
+- `hallId` - ID зала (foreign key)
+- `startTime` - время начала сеанса
+- `endTime` - время окончания сеанса
+- `price` - цена билета
+- `createdAt` - дата создания
+
+**Связи:**
+- Один сеанс связан с **одним фильмом** (N:1)
+- Один сеанс проходит в **одном зале** (N:1)
+- На один сеанс можно продать **много билетов** (1:N)
+
+### 5. 🎟️ Ticket - Билеты
+
+Бронирование или покупка места на конкретный сеанс.
+
+**Атрибуты:**
+- `id` - уникальный идентификатор
+- `sessionId` - ID сеанса (foreign key)
+- `userId` - ID пользователя (foreign key)
+- `seat` - номер места (например, "A1", "B5")
+- `status` - статус билета (RESERVED, PAID, CANCELLED)
+- `createdAt` - дата создания
+- `updatedAt` - дата последнего обновления
+
+**Уникальное ограничение:** `(sessionId, seat)` - одно место не может быть забронировано дважды
+
+**Связи:**
+- Один билет относится к **одному сеансу** (N:1)
+- Один билет принадлежит **одному пользователю** (N:1)
+
+### 6. ⭐ Review - Отзывы
+
+Отзывы пользователей на фильмы.
+
+**Атрибуты:**
+- `id` - уникальный идентификатор
+- `filmId` - ID фильма (foreign key)
+- `userId` - ID пользователя (foreign key)
+- `rating` - оценка (1-5)
+- `comment` - текст отзыва
+- `createdAt` - дата создания
+- `updatedAt` - дата последнего обновления
+
+**Связи:**
+- Один отзыв относится к **одному фильму** (N:1)
+- Один отзыв написан **одним пользователем** (N:1)
+
+---
+
+## 🔗 Связи между сущностями
+
+```
+User (1) ──< (N) Ticket (N) >── (1) Session
+                                       │
+                                       ├── (N) >── (1) Film
+                                       └── (N) >── (1) Hall
+
+User (1) ──< (N) Review (N) >── (1) Film
 ```
 
-## Compile and run the project
+**Типы связей:**
+- **1:N** (One-to-Many) - используется для всех связей
+- **Cascade Delete** - при удалении Film удаляются все связанные Sessions и Reviews
+- **Restrict Delete** - зал нельзя удалить, если есть активные сеансы
 
-```bash
-# development
-$ npm run start
+---
 
-# watch mode
-$ npm run start:dev
+## 🗃️ ER-диаграмма
 
-# production mode
-$ npm run start:prod
+![ER-диаграмма](docs/er-diagram.png)
+
+---
+
+## 🛠️ Технологический стек
+
+### Backend:
+- **NestJS** 11.0.1 - framework для Node.js
+- **TypeScript** 5.7.3 - типизированный JavaScript
+- **Prisma** 6.19.2 - ORM для работы с БД
+- **PostgreSQL** 18.3 - реляционная СУБД
+
+### Frontend:
+- **Handlebars** (hbs, express-handlebars) - шаблонизатор
+- **Tailwind CSS** 2.2.19 - CSS framework
+
+### Инфраструктура:
+- **Render** - хостинг приложения и БД
+- **GitHub** - система контроля версий
+
+---
+
+## 📁 Структура проекта
+
+```
+cinema-management-system/
+├── prisma/
+│   ├── schema.prisma           # Доменная модель (133 строки)
+│   ├── seed.ts                 # Seed данные (280 строк)
+│   └── migrations/             # Миграции БД
+│       └── 20260315185213_init/
+│           └── migration.sql
+├── src/
+│   ├── prisma/                 # Prisma Service
+│   ├── films/                  # Модуль фильмов
+│   ├── sessions/               # Модуль сеансов
+│   ├── tickets/                # Модуль билетов
+│   ├── reviews/                # Модуль отзывов
+│   ├── users/                  # Модуль пользователей
+│   ├── app.controller.ts       # View контроллер
+│   └── main.ts                 # Entry point
+├── views/                      # Handlebars шаблоны
+│   ├── layout.hbs              # Основной layout
+│   ├── partials/               # Переиспользуемые компоненты
+│   └── *.hbs                   # Страницы
+├── public/                     # Статические файлы
+│   └── assets/                 # CSS, JS, изображения
+├── .env                        # Переменные окружения (не в Git!)
+└── package.json                # Зависимости проекта
 ```
 
-## Run tests
+---
 
+## 🚀 API Endpoints
+
+### Films (Фильмы)
+- `GET /api/films` - список всех фильмов
+- `GET /api/films/:id` - информация о фильме
+- `POST /api/films` - добавить фильм
+- `PUT /api/films/:id` - обновить фильм
+- `DELETE /api/films/:id` - удалить фильм
+
+### Sessions (Сеансы)
+- `GET /api/sessions` - список сеансов
+- `GET /api/sessions?filmId=1` - сеансы для фильма
+- `GET /api/sessions?date=2026-03-15` - сеансы на дату
+- `GET /api/sessions/:id` - информация о сеансе
+- `POST /api/sessions` - создать сеанс
+- `PUT /api/sessions/:id` - обновить сеанс
+- `DELETE /api/sessions/:id` - удалить сеанс
+
+### Tickets (Билеты)
+- `GET /api/tickets` - список билетов
+- `GET /api/tickets?userId=1` - билеты пользователя
+- `GET /api/tickets?sessionId=1` - билеты на сеанс
+- `GET /api/tickets/:id` - информация о билете
+- `POST /api/tickets` - забронировать билет
+- `PATCH /api/tickets/:id/status` - обновить статус билета
+- `DELETE /api/tickets/:id` - отменить билет
+
+### Reviews (Отзывы)
+- `GET /api/reviews` - список отзывов
+- `GET /api/reviews?filmId=1` - отзывы на фильм
+- `GET /api/reviews?userId=1` - отзывы пользователя
+- `GET /api/reviews/:id` - информация об отзыве
+- `POST /api/reviews` - добавить отзыв
+- `PUT /api/reviews/:id` - обновить отзыв
+- `DELETE /api/reviews/:id` - удалить отзыв
+
+### Users (Пользователи)
+- `GET /api/users` - список пользователей
+- `GET /api/users/:id` - информация о пользователе
+- `POST /api/users` - создать пользователя
+- `PUT /api/users/:id` - обновить пользователя
+- `DELETE /api/users/:id` - удалить пользователя
+
+---
+
+## 💻 Локальная разработка
+
+### Установка зависимостей:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+### Настройка переменных окружения:
+Создай `.env` в корне проекта:
+```env
+DATABASE_URL="postgresql://user:pass@host:5432/dbname"
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Применение миграций:
+```bash
+npx prisma migrate dev
+```
 
-## Resources
+### Заполнение БД тестовыми данными:
+```bash
+npx prisma db seed
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Запуск в dev режиме:
+```bash
+npm run start:dev
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Приложение доступно на http://localhost:3000
 
-## Support
+### Просмотр БД (Prisma Studio):
+```bash
+npx prisma studio
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+---
 
-## Stay in touch
+## 🌐 Деплой на Render
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Настройки Web Service:
+- **Build Command:** `npm install && npx prisma generate && npx prisma migrate deploy && npm run build`
+- **Start Command:** `npm run start:prod`
+- **Environment Variables:** `DATABASE_URL` (Internal Database URL)
 
-## License
+### Настройки PostgreSQL:
+- **Region:** Frankfurt (EU Central)
+- **Plan:** Free
+- **Connection:** Internal Database URL для Web Service, External для локальной работы
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+---
+
+## 📝 Лабораторные работы
+
+- ✅ **ЛР 1:** Деплой на Render и шаблонизация (Handlebars, MVC, SSR)
+- ✅ **ЛР 2:** Доменная модель и база данных (Prisma, PostgreSQL, REST API)
+
+---
+
+## 📞 Контакты
+
+**Автор:** Лисенко Алёна  
+**Группа:** M3308  
+**Email:** admin@beercinema.ru

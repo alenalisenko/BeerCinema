@@ -13,3 +13,17 @@ package-lock.json
 frontend-old/
 output.css
 макет.pdf
+
+# Environment variables (содержат пароли!)
+.env
+.env.local
+.env.*.local
+
+# Database backups
+backups/
+*.sql
+*.dump
+
+# Prisma
+prisma/*.db
+prisma/*.db-journal
