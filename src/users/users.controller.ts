@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { Role } from '@prisma/client';
+
+type Role = 'CLIENT' | 'ADMIN' | 'MANAGER';
 
 @Controller('api/users')
 export class UsersController {

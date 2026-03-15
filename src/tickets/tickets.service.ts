@@ -1,6 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { TicketStatus } from '@prisma/client';
+
+type TicketStatus = 'RESERVED' | 'PAID' | 'CANCELLED';
 
 @Injectable()
 export class TicketsService {

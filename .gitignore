@@ -27,3 +27,8 @@ backups/
 # Prisma
 prisma/*.db
 prisma/*.db-journal
+
+# Документация и инструкции
+docs/
+LAB1-INSTRUCTIONS.md
+LAB2-PLAN.md

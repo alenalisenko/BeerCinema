@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
-import { TicketStatus } from '@prisma/client';
+
+type TicketStatus = 'RESERVED' | 'PAID' | 'CANCELLED';
 
 @Controller('api/tickets')
 export class TicketsController {
