@@ -5,8 +5,8 @@ import { SessionsService } from './sessions/sessions.service';
 @Controller()
 export class AppController {
   constructor(
-    private filmsService: FilmsService,
-    private sessionsService: SessionsService,
+    private readonly filmsService: FilmsService,
+    private readonly sessionsService: SessionsService,
   ) {}
 
   @Get()
@@ -40,33 +40,6 @@ export class AppController {
       films, 
       schedule, 
       user
-    };
-  }
-
-  @Get('films')
-  @Render('films')
-  async getFilms(@Query('auth') auth?: string) {
-    const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
-    const films = await this.filmsService.findAll();
-    
-    return { 
-      title: 'Фильмы', 
-      user,
-      films,
-      useComments: true
-    };
-  }
-
-  @Get('sessions')
-  @Render('sessions')
-  async getSessions(@Query('auth') auth?: string) {
-    const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
-    const sessions = await this.sessionsService.findAll();
-    
-    return { 
-      title: 'Сеансы', 
-      user,
-      sessions
     };
   }
 

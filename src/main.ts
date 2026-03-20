@@ -7,8 +7,8 @@ import { create } from 'express-handlebars';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  const publicPath = join(__dirname, '..', 'public');
-  const viewsPath = join(__dirname, '..', 'views');
+  const publicPath = join(process.cwd(), 'public');
+  const viewsPath = join(process.cwd(), 'views');
 
   // Статические файлы (картинки, CSS, JS)
   app.useStaticAssets(publicPath);
@@ -19,6 +19,9 @@ async function bootstrap() {
     defaultLayout: 'layout',
     layoutsDir: viewsPath,
     partialsDir: join(viewsPath, 'partials'),
+    helpers: {
+      eq: (a: unknown, b: unknown) => a == b,
+    },
   });
 
   app.engine('hbs', hbs.engine);

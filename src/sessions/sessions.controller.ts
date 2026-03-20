@@ -1,60 +1,116 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, Sse, MessageEvent } from '@nestjs/common';
 import { SessionsService } from './sessions.service';
+import { FilmsService } from '../films/films.service';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-@Controller('api/sessions')
+@Controller('sessions')
 export class SessionsController {
-  constructor(private readonly sessionsService: SessionsService) {}
+  constructor(
+    private readonly sessionsService: SessionsService,
+    private readonly filmsService: FilmsService,
+  ) {}
 
-  @Get()
-  findAll(@Query('filmId') filmId?: string, @Query('date') date?: string) {
-    if (filmId) {
-      return this.sessionsService.findByFilm(parseInt(filmId));
-    }
-    if (date) {
-      return this.sessionsService.findByDate(new Date(date));
-    }
-    return this.sessionsService.findAll();
+  private getUser(auth?: string) {
+    return auth === 'true' ? { name: 'Алёна Лисенко' } : null;
   }
 
-  @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.sessionsService.findOne(id);
-  }
-
-  @Post()
-  create(@Body() body: {
-    filmId: number;
-    hallId: number;
-    startTime: string;
-    endTime: string;
-    price: number;
-  }) {
-    return this.sessionsService.create({
-      ...body,
-      startTime: new Date(body.startTime),
-      endTime: new Date(body.endTime),
+  private formatDateTime(date: Date): string {
+    return new Date(date).toLocaleString('ru-RU', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
     });
   }
 
-  @Put(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: Partial<{
-      filmId: number;
-      hallId: number;
-      startTime: string;
-      endTime: string;
-      price: number;
-    }>,
-  ) {
-    const data: any = { ...body };
-    if (body.startTime) data.startTime = new Date(body.startTime);
-    if (body.endTime) data.endTime = new Date(body.endTime);
-    return this.sessionsService.update(id, data);
+  // GET /sessions — список сеансов
+  @Get()
+  @Render('sessions/index')
+  async index(@Query('auth') auth?: string, @Query('filmId') filmId?: string, @Query('date') date?: string) {
+    const sessions = filmId
+      ? await this.sessionsService.findByFilm(parseInt(filmId))
+      : date
+        ? await this.sessionsService.findByDate(new Date(date))
+        : await this.sessionsService.findAll();
+
+    const formatted = sessions.map((s) => ({
+      ...s,
+      startTimeFormatted: this.formatDateTime(s.startTime),
+      endTimeFormatted: this.formatDateTime(s.endTime),
+    }));
+    return { title: 'Сеансы', user: this.getUser(auth), sessions: formatted };
   }
 
-  @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.sessionsService.remove(id);
+  // GET /sessions/add — форма создания (ВАЖНО: до /:id)
+  @Get('add')
+  @Render('sessions/add')
+  async addForm(@Query('auth') auth?: string) {
+    const films = await this.filmsService.findAll();
+    const halls = await this.sessionsService.findAllHalls();
+    return { title: 'Добавить сеанс', user: this.getUser(auth), films, halls };
+  }
+
+  // GET /sessions/:id/edit — форма редактирования
+  @Get(':id/edit')
+  @Render('sessions/edit')
+  async editForm(@Param('id', ParseIntPipe) id: number, @Query('auth') auth?: string) {
+    const session = await this.sessionsService.findOne(id);
+    const films = await this.filmsService.findAll();
+    const halls = await this.sessionsService.findAllHalls();
+    return { title: 'Редактировать сеанс', user: this.getUser(auth), session, films, halls };
+  }
+
+  // GET /sessions/events — SSE-стрим событий (ВАЖНО: до /:id)
+  @Sse('events')
+  sse(): Observable<MessageEvent> {
+    return this.sessionsService.events$.pipe(
+      map((event) => ({ data: event })),
+    );
+  }
+
+  // GET /sessions/:id — страница сеанса
+  @Get(':id')
+  @Render('sessions/show')
+  async show(@Param('id', ParseIntPipe) id: number, @Query('auth') auth?: string) {
+    const session = await this.sessionsService.findOne(id);
+    const formatted = session ? {
+      ...session,
+      startTimeFormatted: this.formatDateTime(session.startTime),
+      endTimeFormatted: this.formatDateTime(session.endTime),
+    } : null;
+    return { title: 'Сеанс', user: this.getUser(auth), session: formatted };
+  }
+
+  // POST /sessions — создать → редирект на /sessions
+  @Post()
+  @Redirect('/sessions', 302)
+  async create(@Body() body: any) {
+    await this.sessionsService.create({
+      filmId: parseInt(body.filmId),
+      hallId: parseInt(body.hallId),
+      startTime: new Date(body.startTime),
+      endTime: new Date(body.endTime),
+      price: parseFloat(body.price),
+    });
+  }
+
+  // POST /sessions/:id/update — обновить → редирект на /sessions/:id
+  @Post(':id/update')
+  @Redirect()
+  async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
+    await this.sessionsService.update(id, {
+      filmId: body.filmId ? parseInt(body.filmId) : undefined,
+      hallId: body.hallId ? parseInt(body.hallId) : undefined,
+      startTime: body.startTime ? new Date(body.startTime) : undefined,
+      endTime: body.endTime ? new Date(body.endTime) : undefined,
+      price: body.price ? parseFloat(body.price) : undefined,
+    });
+    return { url: `/sessions/${id}`, statusCode: 302 };
+  }
+
+  // POST /sessions/:id/delete — удалить → редирект на /sessions
+  @Post(':id/delete')
+  @Redirect('/sessions', 302)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    await this.sessionsService.remove(id);
   }
 }

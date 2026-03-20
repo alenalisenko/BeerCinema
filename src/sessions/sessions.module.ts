@@ -1,8 +1,10 @@
 import { Module } from '@nestjs/common';
 import { SessionsService } from './sessions.service';
 import { SessionsController } from './sessions.controller';
+import { FilmsModule } from '../films/films.module';
 
 @Module({
+  imports: [FilmsModule],
   providers: [SessionsService],
   controllers: [SessionsController],
   exports: [SessionsService],

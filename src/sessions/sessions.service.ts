@@ -1,8 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Subject } from 'rxjs';
+
+export interface SessionEvent {
+  action: 'created' | 'updated' | 'deleted';
+  sessionId: number;
+  message: string;
+}
 
 @Injectable()
 export class SessionsService {
+  private readonly eventBus = new Subject<SessionEvent>();
+  readonly events$ = this.eventBus.asObservable();
+
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
@@ -83,13 +93,16 @@ export class SessionsService {
     endTime: Date;
     price: number;
   }) {
-    return this.prisma.session.create({
+    const result = await this.prisma.session.create({
       data,
-      include: {
-        film: true,
-        hall: true,
-      },
+      include: { film: true, hall: true },
     });
+    this.eventBus.next({
+      action: 'created',
+      sessionId: result.id,
+      message: `Добавлен новый сеанс: «${result.film.title}» в зале ${result.hall.name}`,
+    });
+    return result;
   }
 
   async update(id: number, data: Partial<{
@@ -99,19 +112,32 @@ export class SessionsService {
     endTime: Date;
     price: number;
   }>) {
-    return this.prisma.session.update({
+    const result = await this.prisma.session.update({
       where: { id },
       data,
-      include: {
-        film: true,
-        hall: true,
-      },
+      include: { film: true, hall: true },
     });
+    this.eventBus.next({
+      action: 'updated',
+      sessionId: result.id,
+      message: `Сеанс #${result.id} изменён: «${result.film.title}»`,
+    });
+    return result;
   }
 
   async remove(id: number) {
-    return this.prisma.session.delete({
+    const result = await this.prisma.session.delete({
       where: { id },
     });
+    this.eventBus.next({
+      action: 'deleted',
+      sessionId: id,
+      message: `Сеанс #${id} удалён`,
+    });
+    return result;
+  }
+
+  async findAllHalls() {
+    return this.prisma.hall.findMany({ orderBy: { name: 'asc' } });
   }
 }

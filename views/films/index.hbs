@@ -1,0 +1,26 @@
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Фильмы</h2>
+    <a href="/films/add" class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded">+ Добавить фильм</a>
+</div>
+
+{{#if films.length}}
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {{#each films}}
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <img src="{{posterUrl}}" alt="{{title}}" class="w-full h-60 object-cover">
+        <div class="p-4">
+            <h3 class="text-lg font-bold mb-1">{{title}}</h3>
+            <p class="text-gray-500 text-sm mb-1">{{genre}} · {{releaseYear}}</p>
+            <p class="text-gray-500 text-sm mb-3">{{duration}} мин.</p>
+            {{#if rating}}<p class="text-yellow-500 font-semibold mb-3">★ {{rating}}</p>{{/if}}
+            <div class="flex gap-2">
+                <a href="/films/{{id}}" class="flex-1 text-center bg-yellow-400 hover:bg-yellow-500 text-white py-1 px-3 rounded text-sm">Подробнее</a>
+                <a href="/films/{{id}}/edit" class="flex-1 text-center bg-gray-200 hover:bg-gray-300 text-gray-700 py-1 px-3 rounded text-sm">Изменить</a>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</div>
+{{else}}
+<p class="text-gray-500 text-center py-12">Фильмов пока нет. <a href="/films/add" class="text-yellow-500 underline">Добавить первый</a></p>
+{{/if}}

@@ -1,0 +1,39 @@
+<div class="mb-4">
+    <a href="/tickets" class="text-yellow-500 hover:underline">← Все билеты</a>
+</div>
+
+{{#if ticket}}
+<div class="bg-white shadow-lg rounded-lg p-6 max-w-xl mx-auto">
+    <h2 class="text-2xl font-bold mb-4">Билет #{{ticket.id}}</h2>
+    <div class="space-y-3 mb-6">
+        <div class="flex justify-between">
+            <span class="text-gray-500">Фильм</span>
+            <a href="/films/{{ticket.session.film.id}}" class="font-semibold text-yellow-500 hover:underline">{{ticket.session.film.title}}</a>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-gray-500">Зал</span>
+            <span class="font-semibold">{{ticket.session.hall.name}}</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-gray-500">Место</span>
+            <span class="font-semibold font-mono">{{ticket.seat}}</span>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-gray-500">Пользователь</span>
+            <a href="/users/{{ticket.user.id}}" class="font-semibold text-yellow-500 hover:underline">{{ticket.user.name}}</a>
+        </div>
+        <div class="flex justify-between">
+            <span class="text-gray-500">Статус</span>
+            <span class="font-semibold">{{ticket.status}}</span>
+        </div>
+    </div>
+    <div class="flex gap-3">
+        <a href="/tickets/{{ticket.id}}/edit" class="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded">Изменить статус</a>
+        <form method="POST" action="/tickets/{{ticket.id}}/delete" onsubmit="return confirm('Удалить билет?')">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Удалить</button>
+        </form>
+    </div>
+</div>
+{{else}}
+<p class="text-gray-500">Билет не найден.</p>
+{{/if}}

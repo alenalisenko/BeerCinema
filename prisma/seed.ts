@@ -3,8 +3,6 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Начинаем заполнение БД тестовыми данными...');
-
   // 1. Создаем пользователей
   const admin = await prisma.user.create({
     data: {
@@ -24,8 +22,6 @@ async function main() {
     },
   });
 
-  console.log('✅ Создано 2 пользователя');
-
   // 2. Создаем залы
   const halls = await prisma.hall.createMany({
     data: [
@@ -35,7 +31,6 @@ async function main() {
     ],
   });
 
-  console.log('✅ Создано 3 кинозала');
 
   // 3. Создаем фильмы
   const film1 = await prisma.film.create({
@@ -122,7 +117,6 @@ async function main() {
     },
   });
 
-  console.log('✅ Создано 7 фильмов');
 
   // 4. Получаем созданные залы
   const hallZOZH = await prisma.hall.findUnique({ where: { name: 'ЗОЖ' } });
@@ -222,7 +216,6 @@ async function main() {
     },
   });
 
-  console.log('✅ Создано 7 сеансов');
 
   // 6. Создаем билеты
   await prisma.ticket.create({
@@ -243,9 +236,6 @@ async function main() {
     },
   });
 
-  console.log('✅ Создано 2 билета');
-
-  // 7. Создаем отзывы
   await prisma.review.create({
     data: {
       filmId: film4.id, // Леон
@@ -263,15 +253,11 @@ async function main() {
       comment: 'Культовая классика российского кино. Сергей Бодров - легенда!',
     },
   });
-
-  console.log('✅ Создано 2 отзыва');
-
-  console.log('\n🎉 База данных успешно заполнена тестовыми данными!');
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Ошибка при заполнении БД:', e);
+    console.error('Ошибка при заполнении БД:', e);
     process.exit(1);
   })
   .finally(async () => {

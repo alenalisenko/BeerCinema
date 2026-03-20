@@ -1,7 +1,3 @@
-// BeerCinema - Доменная модель системы управления кинотеатром
-// Автор: Лисенко Алёна M3308
-// Дата: Март 2026
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// =====================================================
-// СУЩНОСТИ (ENTITIES)
-// =====================================================
-
-// 1. User - Пользователи системы (клиенты, админы, менеджеры)
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -36,7 +27,6 @@ enum Role {
   MANAGER   // Менеджер кинотеатра
 }
 
-// 2. Film - Фильмы в прокате
 model Film {
   id          Int      @id @default(autoincrement())
   title       String
@@ -54,7 +44,6 @@ model Film {
   reviews     Review[]
 }
 
-// 3. Hall - Кинозалы
 model Hall {
   id          Int      @id @default(autoincrement())
   name        String   @unique  // Например: "ЗОЖ", "Балтика", "Разливное пиво"
@@ -66,7 +55,6 @@ model Hall {
   sessions    Session[]
 }
 
-// 4. Session - Киносеансы (показы фильмов)
 model Session {
   id        Int      @id @default(autoincrement())
   filmId    Int
@@ -87,7 +75,6 @@ model Session {
   @@index([startTime])
 }
 
-// 5. Ticket - Билеты на сеансы
 model Ticket {
   id        Int          @id @default(autoincrement())
   sessionId Int
@@ -101,7 +88,7 @@ model Ticket {
   session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Уникальное ограничение: одно место не может быть забронировано дважды на один сеанс
+  // одно место не может быть забронировано дважды на один сеанс
   @@unique([sessionId, seat])
   @@index([userId])
 }
@@ -112,7 +99,6 @@ enum TicketStatus {
   CANCELLED  // Отменен
 }
 
-// 6. Review - Отзывы на фильмы
 model Review {
   id        Int      @id @default(autoincrement())
   filmId    Int

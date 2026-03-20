@@ -1,0 +1,76 @@
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold">Сеансы</h2>
+    <a href="/sessions/add" class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded">+ Добавить сеанс</a>
+</div>
+
+<div id="sse-status" class="text-xs text-gray-400 mb-2">● подключение к обновлениям...</div>
+
+{{#if sessions.length}}
+<div class="bg-white shadow rounded-lg overflow-hidden">
+    <table class="min-w-full">
+        <thead class="bg-yellow-400 text-white">
+            <tr>
+                <th class="py-3 px-4 text-left">Фильм</th>
+                <th class="py-3 px-4 text-left">Зал</th>
+                <th class="py-3 px-4 text-left">Начало</th>
+                <th class="py-3 px-4 text-left">Конец</th>
+                <th class="py-3 px-4 text-left">Цена</th>
+                <th class="py-3 px-4 text-left">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each sessions}}
+            <tr class="border-t hover:bg-gray-50">
+                <td class="py-3 px-4">{{film.title}}</td>
+                <td class="py-3 px-4">{{hall.name}}</td>
+                <td class="py-3 px-4">{{startTimeFormatted}}</td>
+                <td class="py-3 px-4">{{endTimeFormatted}}</td>
+                <td class="py-3 px-4">{{price}} ₽</td>
+                <td class="py-3 px-4 flex gap-2">
+                    <a href="/sessions/{{id}}" class="text-yellow-500 hover:underline text-sm">Подробнее</a>
+                    <a href="/sessions/{{id}}/edit" class="text-gray-500 hover:underline text-sm">Изменить</a>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+{{else}}
+<p class="text-gray-500 text-center py-12">Сеансов пока нет. <a href="/sessions/add" class="text-yellow-500 underline">Добавить первый</a></p>
+{{/if}}
+
+<script>
+  toastr.options = {
+    positionClass: 'toast-bottom-right',
+    timeOut: 5000,
+    progressBar: true,
+  };
+
+  const statusEl = document.getElementById('sse-status');
+  const eventSource = new EventSource('/sessions/events');
+
+  eventSource.onopen = function () {
+    statusEl.textContent = '● онлайн — расписание обновляется в реальном времени';
+    statusEl.className = 'text-xs text-green-500 mb-2';
+  };
+
+  eventSource.onmessage = function (e) {
+    const event = JSON.parse(e.data);
+
+    if (event.action === 'created') {
+      toastr.success(event.message, 'Новый сеанс');
+    } else if (event.action === 'updated') {
+      toastr.info(event.message, 'Сеанс изменён');
+    } else if (event.action === 'deleted') {
+      toastr.warning(event.message, 'Сеанс удалён');
+    }
+
+    // Перезагрузить таблицу через 1 секунду чтобы отразить изменения
+    setTimeout(() => location.reload(), 1000);
+  };
+
+  eventSource.onerror = function () {
+    statusEl.textContent = '● офлайн — нет соединения';
+    statusEl.className = 'text-xs text-red-400 mb-2';
+  };
+</script>
