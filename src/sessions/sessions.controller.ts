@@ -40,7 +40,7 @@ export class SessionsController {
     return { title: 'Сеансы', user: this.getUser(auth), sessions: formatted };
   }
 
-  // GET /sessions/add — форма создания (ВАЖНО: до /:id)
+  // GET /sessions/add — форма создания
   @Get('add')
   @Render('sessions/add')
   async addForm(@Query('auth') auth?: string) {
@@ -59,7 +59,7 @@ export class SessionsController {
     return { title: 'Редактировать сеанс', user: this.getUser(auth), session, films, halls };
   }
 
-  // GET /sessions/events — SSE-стрим событий (ВАЖНО: до /:id)
+  // GET /sessions/events — SSE-стрим событий
   @Sse('events')
   sse(): Observable<MessageEvent> {
     return this.sessionsService.events$.pipe(

@@ -25,7 +25,7 @@ export class ReviewsController {
     return { title: 'Отзывы', user: this.getUser(auth), reviews };
   }
 
-  // GET /reviews/add — форма создания (ВАЖНО: до /:id)
+  // GET /reviews/add — форма создания
   @Get('add')
   @Render('reviews/add')
   async addForm(@Query('auth') auth?: string) {

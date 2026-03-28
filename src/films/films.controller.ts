@@ -17,7 +17,7 @@ export class FilmsController {
     return { title: 'Фильмы', user: this.getUser(auth), films };
   }
 
-  // GET /films/add — форма создания (ВАЖНО: до /:id)
+  // GET /films/add — форма создания
   @Get('add')
   @Render('films/add')
   addForm(@Query('auth') auth?: string) {
@@ -40,7 +40,7 @@ export class FilmsController {
     return { title: film?.title ?? 'Фильм', user: this.getUser(auth), film };
   }
 
-  // POST /films — создать → редирект на /films
+  // POST /films — создать + редирект на /films
   @Post()
   @Redirect('/films', 302)
   async create(@Body() body: any) {
@@ -55,7 +55,7 @@ export class FilmsController {
     });
   }
 
-  // POST /films/:id/update — обновить → редирект на /films/:id
+  // POST /films/:id/update — обновить + редирект на /films/:id
   @Post(':id/update')
   @Redirect()
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
@@ -71,7 +71,7 @@ export class FilmsController {
     return { url: `/films/${id}`, statusCode: 302 };
   }
 
-  // POST /films/:id/delete — удалить → редирект на /films
+  // POST /films/:id/delete — удалить + редирект на /films
   @Post(':id/delete')
   @Redirect('/films', 302)
   async remove(@Param('id', ParseIntPipe) id: number) {

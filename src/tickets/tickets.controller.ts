@@ -27,7 +27,7 @@ export class TicketsController {
     return { title: 'Билеты', user: this.getUser(auth), tickets };
   }
 
-  // GET /tickets/add — форма создания (ВАЖНО: до /:id)
+  // GET /tickets/add — форма создания
   @Get('add')
   @Render('tickets/add')
   async addForm(@Query('auth') auth?: string) {

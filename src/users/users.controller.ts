@@ -21,7 +21,7 @@ export class UsersController {
     return { title: 'Пользователи', user: this.getUser(auth), users };
   }
 
-  // GET /users/add — форма создания (ВАЖНО: до /:id)
+  // GET /users/add — форма создания
   @Get('add')
   @Render('users/add')
   addForm(@Query('auth') auth?: string) {
@@ -46,7 +46,7 @@ export class UsersController {
     return { title: userData?.name ?? 'Пользователь', user: this.getUser(auth), userData };
   }
 
-  // POST /users — создать → редирект на /users
+  // POST /users — создать + редирект на /users
   @Post()
   @Redirect('/users', 302)
   async create(@Body() body: any) {
@@ -58,7 +58,7 @@ export class UsersController {
     });
   }
 
-  // POST /users/:id/update — обновить → редирект на /users/:id
+  // POST /users/:id/update — обновить + редирект на /users/:id
   @Post(':id/update')
   @Redirect()
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
@@ -71,7 +71,7 @@ export class UsersController {
     return { url: `/users/${id}`, statusCode: 302 };
   }
 
-  // POST /users/:id/delete — удалить → редирект на /users
+  // POST /users/:id/delete — удалить + редирект на /users
   @Post(':id/delete')
   @Redirect('/users', 302)
   async remove(@Param('id', ParseIntPipe) id: number) {
