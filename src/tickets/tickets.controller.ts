@@ -1,9 +1,11 @@
 import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { TicketsService } from './tickets.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 type TicketStatus = 'RESERVED' | 'PAID' | 'CANCELLED';
 
+@ApiExcludeController()
 @Controller('tickets')
 export class TicketsController {
   constructor(

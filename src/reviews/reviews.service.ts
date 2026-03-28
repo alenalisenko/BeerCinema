@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -116,5 +116,31 @@ export class ReviewsService {
     return this.prisma.review.delete({
       where: { id },
     });
+  }
+
+  async findOneOrFail(id: number) {
+    const review = await this.findOne(id);
+    if (!review) throw new NotFoundException(`Отзыв #${id} не найден`);
+    return review;
+  }
+
+  async findAllPaginated(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.prisma.review.findMany({
+        skip,
+        take: limit,
+        include: {
+          film: { select: { id: true, title: true } },
+          user: { select: { id: true, name: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.review.count(),
+    ]);
+    return {
+      data: items,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 }

@@ -1,7 +1,9 @@
 import { Controller, Get, Query, Render } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { FilmsService } from './films/films.service';
 import { SessionsService } from './sessions/sessions.service';
 
+@ApiExcludeController()
 @Controller()
 export class AppController {
   constructor(

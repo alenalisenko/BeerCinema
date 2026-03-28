@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 type Role = 'CLIENT' | 'ADMIN' | 'MANAGER';
@@ -120,6 +120,47 @@ export class UsersService {
         email: true,
         name: true,
       },
+    });
+  }
+
+  async findOneOrFail(id: number) {
+    const user = await this.findOne(id);
+    if (!user) throw new NotFoundException(`Пользователь #${id} не найден`);
+    return user;
+  }
+
+  async findAllPaginated(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.prisma.user.findMany({
+        skip,
+        take: limit,
+        select: { id: true, email: true, name: true, role: true, createdAt: true, updatedAt: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.user.count(),
+    ]);
+    return {
+      data: items,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  async findTickets(userId: number) {
+    await this.findOneOrFail(userId);
+    return this.prisma.ticket.findMany({
+      where: { userId },
+      include: { session: { include: { film: true, hall: true } } },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findReviews(userId: number) {
+    await this.findOneOrFail(userId);
+    return this.prisma.review.findMany({
+      where: { userId },
+      include: { film: { select: { id: true, title: true } } },
+      orderBy: { createdAt: 'desc' },
     });
   }
 }

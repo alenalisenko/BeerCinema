@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 type TicketStatus = 'RESERVED' | 'PAID' | 'CANCELLED';
@@ -137,5 +137,31 @@ export class TicketsService {
     return this.prisma.ticket.delete({
       where: { id },
     });
+  }
+
+  async findOneOrFail(id: number) {
+    const ticket = await this.findOne(id);
+    if (!ticket) throw new NotFoundException(`Билет #${id} не найден`);
+    return ticket;
+  }
+
+  async findAllPaginated(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.prisma.ticket.findMany({
+        skip,
+        take: limit,
+        include: {
+          session: { include: { film: true, hall: true } },
+          user: { select: { id: true, name: true, email: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.ticket.count(),
+    ]);
+    return {
+      data: items,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 }

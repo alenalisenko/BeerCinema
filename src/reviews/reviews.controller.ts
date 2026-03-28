@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
 import { PrismaService } from '../prisma/prisma.service';
 
+@ApiExcludeController()
 @Controller('reviews')
 export class ReviewsController {
   constructor(

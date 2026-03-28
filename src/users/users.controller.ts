@@ -1,8 +1,10 @@
 import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 
 type Role = 'CLIENT' | 'ADMIN' | 'MANAGER';
 
+@ApiExcludeController()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

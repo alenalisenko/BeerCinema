@@ -1,9 +1,11 @@
 import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, Sse, MessageEvent } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { SessionsService } from './sessions.service';
 import { FilmsService } from '../films/films.service';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+@ApiExcludeController()
 @Controller('sessions')
 export class SessionsController {
   constructor(

@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect } from '@nestjs/common';
+import { ApiExcludeController } from '@nestjs/swagger';
 import { FilmsService } from './films.service';
 
+@ApiExcludeController()
 @Controller('films')
 export class FilmsController {
   constructor(private readonly filmsService: FilmsService) {}

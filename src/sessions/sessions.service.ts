@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Subject } from 'rxjs';
 
@@ -139,5 +139,37 @@ export class SessionsService {
 
   async findAllHalls() {
     return this.prisma.hall.findMany({ orderBy: { name: 'asc' } });
+  }
+
+  async findOneOrFail(id: number) {
+    const session = await this.findOne(id);
+    if (!session) throw new NotFoundException(`Сеанс #${id} не найден`);
+    return session;
+  }
+
+  async findAllPaginated(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const [items, total] = await Promise.all([
+      this.prisma.session.findMany({
+        skip,
+        take: limit,
+        include: { film: true, hall: true },
+        orderBy: { startTime: 'asc' },
+      }),
+      this.prisma.session.count(),
+    ]);
+    return {
+      data: items,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
+  }
+
+  async findTickets(sessionId: number) {
+    await this.findOneOrFail(sessionId);
+    return this.prisma.ticket.findMany({
+      where: { sessionId },
+      include: { user: { select: { id: true, name: true } } },
+      orderBy: { seat: 'asc' },
+    });
   }
 }
