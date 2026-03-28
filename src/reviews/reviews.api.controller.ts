@@ -22,7 +22,7 @@ export class ReviewsApiController {
     const result = await this.reviewsService.findAllPaginated(+page, +limit);
     const links: string[] = [];
     if (+page > 1) links.push(`</api/reviews?page=${+page - 1}&limit=${limit}>; rel="prev"`);
-    if (+page < result.meta.totalPages) links.push(`</api/reviews?page=${+page + 1}&limit=${limit}>; rel="next"`);
+    if (+page < result.totalPages) links.push(`</api/reviews?page=${+page + 1}&limit=${limit}>; rel="next"`);
     if (links.length) res.setHeader('Link', links.join(', '));
     return result;
   }

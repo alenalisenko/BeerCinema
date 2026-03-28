@@ -161,7 +161,10 @@ export class TicketsService {
     ]);
     return {
       data: items,
-      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 }

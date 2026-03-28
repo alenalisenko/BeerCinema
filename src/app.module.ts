@@ -1,4 +1,8 @@
 import { Module } from '@nestjs/common';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import depthLimit from 'graphql-depth-limit';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -9,7 +13,21 @@ import { TicketsModule } from './tickets/tickets.module';
 import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
-  imports: [PrismaModule, FilmsModule, SessionsModule, UsersModule, TicketsModule, ReviewsModule],
+  imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+      introspection: true,
+      validationRules: [depthLimit(5)],
+    }),
+    PrismaModule,
+    FilmsModule,
+    SessionsModule,
+    UsersModule,
+    TicketsModule,
+    ReviewsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

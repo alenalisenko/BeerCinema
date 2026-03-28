@@ -1,0 +1,537 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateFilmInput {
+  """Описание фильма"""
+  description: String!
+
+  """Длительность в минутах"""
+  duration: Int!
+
+  """Жанр"""
+  genre: String!
+
+  """URL постера"""
+  posterUrl: String!
+
+  """Рейтинг от 1.0 до 5.0"""
+  rating: Float
+
+  """Год выхода"""
+  releaseYear: Int!
+
+  """Название фильма"""
+  title: String!
+}
+
+input CreateReviewInput {
+  """Текст отзыва"""
+  comment: String!
+
+  """ID фильма"""
+  filmId: Int!
+
+  """Оценка от 1 до 5"""
+  rating: Int!
+
+  """ID пользователя"""
+  userId: Int!
+}
+
+input CreateSessionInput {
+  """Время конца (ISO 8601)"""
+  endTime: String!
+
+  """ID фильма"""
+  filmId: Int!
+
+  """ID зала"""
+  hallId: Int!
+
+  """Цена билета в рублях"""
+  price: Float!
+
+  """Время начала (ISO 8601)"""
+  startTime: String!
+}
+
+input CreateTicketInput {
+  """Номер места (например A1, B12)"""
+  seat: String!
+
+  """ID сеанса"""
+  sessionId: Int!
+
+  """ID пользователя"""
+  userId: Int!
+}
+
+input CreateUserInput {
+  """Email адрес"""
+  email: String!
+
+  """Имя пользователя"""
+  name: String!
+
+  """Пароль (минимум 6 символов)"""
+  password: String!
+
+  """Роль (по умолчанию CLIENT)"""
+  role: Role
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type FilmType {
+  """Дата создания"""
+  createdAt: DateTime!
+
+  """Описание фильма"""
+  description: String!
+
+  """Длительность в минутах"""
+  duration: Int!
+
+  """Жанр"""
+  genre: String!
+
+  """ID фильма"""
+  id: Int!
+
+  """URL постера"""
+  posterUrl: String!
+
+  """Рейтинг от 1.0 до 5.0"""
+  rating: Float
+
+  """Год выхода"""
+  releaseYear: Int!
+
+  """Отзывы о фильме"""
+  reviews: [ReviewType!]!
+
+  """Сеансы фильма"""
+  sessions: [SessionType!]!
+
+  """Название фильма"""
+  title: String!
+
+  """Дата обновления"""
+  updatedAt: DateTime!
+}
+
+type HallType {
+  """Вместимость зала"""
+  capacity: Int!
+
+  """Описание зала"""
+  description: String
+
+  """ID зала"""
+  id: Int!
+
+  """Название зала"""
+  name: String!
+}
+
+type Mutation {
+  """Отменить билет"""
+  cancelTicket(id: Int!): TicketType!
+
+  """Создать фильм"""
+  createFilm(input: CreateFilmInput!): FilmType!
+
+  """Создать отзыв"""
+  createReview(input: CreateReviewInput!): ReviewType!
+
+  """Создать сеанс"""
+  createSession(input: CreateSessionInput!): SessionType!
+
+  """Создать билет (забронировать место)"""
+  createTicket(input: CreateTicketInput!): TicketType!
+
+  """Создать пользователя"""
+  createUser(input: CreateUserInput!): UserType!
+
+  """Оплатить билет"""
+  payTicket(id: Int!): TicketType!
+
+  """Удалить фильм"""
+  removeFilm(id: Int!): FilmType!
+
+  """Удалить отзыв"""
+  removeReview(id: Int!): ReviewType!
+
+  """Удалить сеанс"""
+  removeSession(id: Int!): SessionType!
+
+  """Удалить билет"""
+  removeTicket(id: Int!): TicketType!
+
+  """Удалить пользователя"""
+  removeUser(id: Int!): UserType!
+
+  """
+  Вернуть билет в статус "Забронирован"
+  """
+  reserveTicket(id: Int!): TicketType!
+
+  """Обновить фильм"""
+  updateFilm(id: Int!, input: UpdateFilmInput!): FilmType!
+
+  """Обновить отзыв"""
+  updateReview(id: Int!, input: UpdateReviewInput!): ReviewType!
+
+  """Обновить сеанс"""
+  updateSession(id: Int!, input: UpdateSessionInput!): SessionType!
+
+  """Обновить пользователя"""
+  updateUser(id: Int!, input: UpdateUserInput!): UserType!
+}
+
+type PaginatedFilms {
+  """Список фильмов"""
+  data: [FilmType!]!
+
+  """Записей на странице"""
+  limit: Int!
+
+  """Текущая страница"""
+  page: Int!
+
+  """Всего записей"""
+  total: Int!
+
+  """Всего страниц"""
+  totalPages: Int!
+}
+
+type PaginatedReviews {
+  """Список отзывов"""
+  data: [ReviewType!]!
+
+  """Записей на странице"""
+  limit: Int!
+
+  """Текущая страница"""
+  page: Int!
+
+  """Всего записей"""
+  total: Int!
+
+  """Всего страниц"""
+  totalPages: Int!
+}
+
+type PaginatedSessions {
+  """Список сеансов"""
+  data: [SessionType!]!
+
+  """Записей на странице"""
+  limit: Int!
+
+  """Текущая страница"""
+  page: Int!
+
+  """Всего записей"""
+  total: Int!
+
+  """Всего страниц"""
+  totalPages: Int!
+}
+
+type PaginatedTickets {
+  """Список билетов"""
+  data: [TicketType!]!
+
+  """Записей на странице"""
+  limit: Int!
+
+  """Текущая страница"""
+  page: Int!
+
+  """Всего записей"""
+  total: Int!
+
+  """Всего страниц"""
+  totalPages: Int!
+}
+
+type PaginatedUsers {
+  """Список пользователей"""
+  data: [UserType!]!
+
+  """Записей на странице"""
+  limit: Int!
+
+  """Текущая страница"""
+  page: Int!
+
+  """Всего записей"""
+  total: Int!
+
+  """Всего страниц"""
+  totalPages: Int!
+}
+
+type Query {
+  """Фильм по ID"""
+  film(id: Int!): FilmType
+
+  """Список фильмов с пагинацией"""
+  films(
+    """Записей на странице"""
+    limit: Int! = 10
+
+    """Номер страницы"""
+    page: Int! = 1
+  ): PaginatedFilms!
+
+  """Отзыв по ID"""
+  review(id: Int!): ReviewType
+
+  """Список отзывов с пагинацией"""
+  reviews(
+    """Записей на странице"""
+    limit: Int! = 10
+
+    """Номер страницы"""
+    page: Int! = 1
+  ): PaginatedReviews!
+
+  """Сеанс по ID"""
+  session(id: Int!): SessionType
+
+  """Список сеансов с пагинацией"""
+  sessions(
+    """Записей на странице"""
+    limit: Int! = 10
+
+    """Номер страницы"""
+    page: Int! = 1
+  ): PaginatedSessions!
+
+  """Билет по ID"""
+  ticket(id: Int!): TicketType
+
+  """Список билетов с пагинацией"""
+  tickets(limit: Int! = 10, page: Int! = 1): PaginatedTickets!
+
+  """Пользователь по ID"""
+  user(id: Int!): UserType
+
+  """Список пользователей с пагинацией"""
+  users(
+    """Записей на странице"""
+    limit: Int! = 10
+
+    """Номер страницы"""
+    page: Int! = 1
+  ): PaginatedUsers!
+}
+
+type ReviewType {
+  """Текст отзыва"""
+  comment: String!
+
+  """Дата создания"""
+  createdAt: DateTime!
+
+  """Фильм отзыва"""
+  film: FilmType!
+
+  """ID фильма"""
+  filmId: Int!
+
+  """ID отзыва"""
+  id: Int!
+
+  """Оценка от 1 до 5"""
+  rating: Int!
+
+  """Дата обновления"""
+  updatedAt: DateTime!
+
+  """Автор отзыва"""
+  user: UserType!
+
+  """ID пользователя"""
+  userId: Int!
+}
+
+"""Роль пользователя"""
+enum Role {
+  """Администратор"""
+  ADMIN
+
+  """Обычный пользователь"""
+  CLIENT
+
+  """Менеджер кинотеатра"""
+  MANAGER
+}
+
+type SessionType {
+  """Дата создания"""
+  createdAt: DateTime!
+
+  """Время конца"""
+  endTime: DateTime!
+
+  """Фильм сеанса"""
+  film: FilmType!
+
+  """ID фильма"""
+  filmId: Int!
+
+  """Зал сеанса"""
+  hall: HallType!
+
+  """ID зала"""
+  hallId: Int!
+
+  """ID сеанса"""
+  id: Int!
+
+  """Цена билета в рублях"""
+  price: Float!
+
+  """Время начала"""
+  startTime: DateTime!
+
+  """Билеты на сеанс"""
+  tickets: [TicketType!]!
+}
+
+"""Статус билета"""
+enum TicketStatus {
+  """Отменён"""
+  CANCELLED
+
+  """Оплачен"""
+  PAID
+
+  """Забронирован"""
+  RESERVED
+}
+
+type TicketType {
+  """Дата создания"""
+  createdAt: DateTime!
+
+  """ID билета"""
+  id: Int!
+
+  """Номер места (например A1, B12)"""
+  seat: String!
+
+  """Сеанс билета"""
+  session: SessionType!
+
+  """ID сеанса"""
+  sessionId: Int!
+
+  """Статус билета"""
+  status: TicketStatus!
+
+  """Дата обновления"""
+  updatedAt: DateTime!
+
+  """Владелец билета"""
+  user: UserType!
+
+  """ID пользователя"""
+  userId: Int!
+}
+
+input UpdateFilmInput {
+  """Описание фильма"""
+  description: String
+
+  """Длительность в минутах"""
+  duration: Int
+
+  """Жанр"""
+  genre: String
+
+  """URL постера"""
+  posterUrl: String
+
+  """Рейтинг от 1.0 до 5.0"""
+  rating: Float
+
+  """Год выхода"""
+  releaseYear: Int
+
+  """Название фильма"""
+  title: String
+}
+
+input UpdateReviewInput {
+  """Текст отзыва"""
+  comment: String
+
+  """Оценка от 1 до 5"""
+  rating: Int
+}
+
+input UpdateSessionInput {
+  """Время конца (ISO 8601)"""
+  endTime: String
+
+  """ID фильма"""
+  filmId: Int
+
+  """ID зала"""
+  hallId: Int
+
+  """Цена билета в рублях"""
+  price: Float
+
+  """Время начала (ISO 8601)"""
+  startTime: String
+}
+
+input UpdateUserInput {
+  """Email адрес"""
+  email: String
+
+  """Имя пользователя"""
+  name: String
+
+  """Пароль (минимум 6 символов)"""
+  password: String
+
+  """Роль (по умолчанию CLIENT)"""
+  role: Role
+}
+
+type UserType {
+  """Дата регистрации"""
+  createdAt: DateTime!
+
+  """Email адрес"""
+  email: String!
+
+  """ID пользователя"""
+  id: Int!
+
+  """Имя пользователя"""
+  name: String!
+
+  """Отзывы пользователя"""
+  reviews: [ReviewType!]!
+
+  """Роль пользователя"""
+  role: Role!
+
+  """Билеты пользователя"""
+  tickets: [TicketType!]!
+
+  """Дата обновления"""
+  updatedAt: DateTime!
+}
