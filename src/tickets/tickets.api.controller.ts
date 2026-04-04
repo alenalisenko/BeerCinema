@@ -14,6 +14,7 @@ export class TicketsApiController {
   @ApiOperation({ summary: 'Список билетов с пагинацией' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiResponse({ status: 200, description: 'Список билетов с метаданными пагинации' })
   async findAll(
     @Query('page') page = '1',
     @Query('limit') limit = '10',
@@ -29,6 +30,7 @@ export class TicketsApiController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Билет по ID' })
+  @ApiResponse({ status: 200, description: 'Билет найден' })
   @ApiResponse({ status: 404, description: 'Билет не найден' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.ticketsService.findOneOrFail(id);
@@ -36,6 +38,7 @@ export class TicketsApiController {
 
   @Post()
   @ApiOperation({ summary: 'Создать билет (забронировать место)' })
+  @ApiResponse({ status: 201, description: 'Билет создан', type: CreateTicketDto })
   @ApiResponse({ status: 400, description: 'Место уже занято или ошибка валидации' })
   create(@Body() dto: CreateTicketDto) {
     return this.ticketsService.create(dto);
@@ -43,6 +46,8 @@ export class TicketsApiController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить статус билета' })
+  @ApiResponse({ status: 200, description: 'Статус билета обновлён' })
+  @ApiResponse({ status: 404, description: 'Билет не найден' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateTicketDto) {
     if (!dto.status) return this.ticketsService.findOneOrFail(id);
     return this.ticketsService.updateStatus(id, dto.status);
@@ -51,6 +56,8 @@ export class TicketsApiController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить билет' })
+  @ApiResponse({ status: 204, description: 'Билет удалён' })
+  @ApiResponse({ status: 404, description: 'Билет не найден' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.ticketsService.remove(id);
   }

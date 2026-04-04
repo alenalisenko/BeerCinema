@@ -14,6 +14,7 @@ export class UsersApiController {
   @ApiOperation({ summary: 'Список пользователей с пагинацией' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiResponse({ status: 200, description: 'Список пользователей с метаданными пагинации' })
   async findAll(
     @Query('page') page = '1',
     @Query('limit') limit = '10',
@@ -29,6 +30,7 @@ export class UsersApiController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Пользователь по ID' })
+  @ApiResponse({ status: 200, description: 'Пользователь найден' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOneOrFail(id);
@@ -36,18 +38,23 @@ export class UsersApiController {
 
   @Get(':id/tickets')
   @ApiOperation({ summary: 'Билеты пользователя' })
+  @ApiResponse({ status: 200, description: 'Список билетов пользователя' })
+  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   getTickets(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findTickets(id);
   }
 
   @Get(':id/reviews')
   @ApiOperation({ summary: 'Отзывы пользователя' })
+  @ApiResponse({ status: 200, description: 'Список отзывов пользователя' })
+  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   getReviews(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findReviews(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Создать пользователя' })
+  @ApiResponse({ status: 201, description: 'Пользователь создан', type: CreateUserDto })
   @ApiResponse({ status: 400, description: 'Ошибка валидации' })
   @ApiResponse({ status: 409, description: 'Email уже занят' })
   create(@Body() dto: CreateUserDto) {
@@ -56,6 +63,8 @@ export class UsersApiController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить пользователя' })
+  @ApiResponse({ status: 200, description: 'Пользователь обновлён' })
+  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
     return this.usersService.update(id, dto);
   }
@@ -63,6 +72,8 @@ export class UsersApiController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить пользователя' })
+  @ApiResponse({ status: 204, description: 'Пользователь удалён' })
+  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);
   }

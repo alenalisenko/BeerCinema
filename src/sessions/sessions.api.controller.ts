@@ -14,6 +14,7 @@ export class SessionsApiController {
   @ApiOperation({ summary: 'Список сеансов с пагинацией' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiResponse({ status: 200, description: 'Список сеансов с метаданными пагинации' })
   async findAll(
     @Query('page') page = '1',
     @Query('limit') limit = '10',
@@ -29,6 +30,7 @@ export class SessionsApiController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Сеанс по ID' })
+  @ApiResponse({ status: 200, description: 'Сеанс найден' })
   @ApiResponse({ status: 404, description: 'Сеанс не найден' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.sessionsService.findOneOrFail(id);
@@ -36,12 +38,15 @@ export class SessionsApiController {
 
   @Get(':id/tickets')
   @ApiOperation({ summary: 'Билеты сеанса' })
+  @ApiResponse({ status: 200, description: 'Список билетов сеанса' })
+  @ApiResponse({ status: 404, description: 'Сеанс не найден' })
   getTickets(@Param('id', ParseIntPipe) id: number) {
     return this.sessionsService.findTickets(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Создать сеанс' })
+  @ApiResponse({ status: 201, description: 'Сеанс создан', type: CreateSessionDto })
   @ApiResponse({ status: 400, description: 'Ошибка валидации' })
   create(@Body() dto: CreateSessionDto) {
     return this.sessionsService.create({
@@ -53,6 +58,8 @@ export class SessionsApiController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить сеанс' })
+  @ApiResponse({ status: 200, description: 'Сеанс обновлён' })
+  @ApiResponse({ status: 404, description: 'Сеанс не найден' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateSessionDto) {
     return this.sessionsService.update(id, {
       ...dto,
@@ -64,6 +71,8 @@ export class SessionsApiController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить сеанс' })
+  @ApiResponse({ status: 204, description: 'Сеанс удалён' })
+  @ApiResponse({ status: 404, description: 'Сеанс не найден' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.sessionsService.remove(id);
   }

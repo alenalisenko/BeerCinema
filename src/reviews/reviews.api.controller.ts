@@ -14,6 +14,7 @@ export class ReviewsApiController {
   @ApiOperation({ summary: 'Список отзывов с пагинацией' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiResponse({ status: 200, description: 'Список отзывов с метаданными пагинации' })
   async findAll(
     @Query('page') page = '1',
     @Query('limit') limit = '10',
@@ -29,6 +30,7 @@ export class ReviewsApiController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Отзыв по ID' })
+  @ApiResponse({ status: 200, description: 'Отзыв найден' })
   @ApiResponse({ status: 404, description: 'Отзыв не найден' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.reviewsService.findOneOrFail(id);
@@ -36,6 +38,7 @@ export class ReviewsApiController {
 
   @Post()
   @ApiOperation({ summary: 'Создать отзыв' })
+  @ApiResponse({ status: 201, description: 'Отзыв создан', type: CreateReviewDto })
   @ApiResponse({ status: 400, description: 'Ошибка валидации' })
   create(@Body() dto: CreateReviewDto) {
     return this.reviewsService.create(dto);
@@ -43,6 +46,8 @@ export class ReviewsApiController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить отзыв' })
+  @ApiResponse({ status: 200, description: 'Отзыв обновлён' })
+  @ApiResponse({ status: 404, description: 'Отзыв не найден' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateReviewDto) {
     return this.reviewsService.update(id, dto);
   }
@@ -50,6 +55,8 @@ export class ReviewsApiController {
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить отзыв' })
+  @ApiResponse({ status: 204, description: 'Отзыв удалён' })
+  @ApiResponse({ status: 404, description: 'Отзыв не найден' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.reviewsService.remove(id);
   }
