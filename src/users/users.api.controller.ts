@@ -31,6 +31,7 @@ export class UsersApiController {
   @Get(':id')
   @ApiOperation({ summary: 'Пользователь по ID' })
   @ApiResponse({ status: 200, description: 'Пользователь найден' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOneOrFail(id);
@@ -39,6 +40,7 @@ export class UsersApiController {
   @Get(':id/tickets')
   @ApiOperation({ summary: 'Билеты пользователя' })
   @ApiResponse({ status: 200, description: 'Список билетов пользователя' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   getTickets(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findTickets(id);
@@ -47,6 +49,7 @@ export class UsersApiController {
   @Get(':id/reviews')
   @ApiOperation({ summary: 'Отзывы пользователя' })
   @ApiResponse({ status: 200, description: 'Список отзывов пользователя' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   getReviews(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findReviews(id);
@@ -64,7 +67,9 @@ export class UsersApiController {
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить пользователя' })
   @ApiResponse({ status: 200, description: 'Пользователь обновлён' })
+  @ApiResponse({ status: 400, description: 'Ошибка валидации или ID не число' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  @ApiResponse({ status: 409, description: 'Email уже занят' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
     return this.usersService.update(id, dto);
   }
@@ -73,6 +78,7 @@ export class UsersApiController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить пользователя' })
   @ApiResponse({ status: 204, description: 'Пользователь удалён' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Пользователь не найден' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.remove(id);

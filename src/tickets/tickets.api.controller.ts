@@ -31,6 +31,7 @@ export class TicketsApiController {
   @Get(':id')
   @ApiOperation({ summary: 'Билет по ID' })
   @ApiResponse({ status: 200, description: 'Билет найден' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Билет не найден' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.ticketsService.findOneOrFail(id);
@@ -47,6 +48,7 @@ export class TicketsApiController {
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить статус билета' })
   @ApiResponse({ status: 200, description: 'Статус билета обновлён' })
+  @ApiResponse({ status: 400, description: 'Ошибка валидации или ID не число' })
   @ApiResponse({ status: 404, description: 'Билет не найден' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateTicketDto) {
     if (!dto.status) return this.ticketsService.findOneOrFail(id);
@@ -57,6 +59,7 @@ export class TicketsApiController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить билет' })
   @ApiResponse({ status: 204, description: 'Билет удалён' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Билет не найден' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.ticketsService.remove(id);

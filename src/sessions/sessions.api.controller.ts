@@ -31,6 +31,7 @@ export class SessionsApiController {
   @Get(':id')
   @ApiOperation({ summary: 'Сеанс по ID' })
   @ApiResponse({ status: 200, description: 'Сеанс найден' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Сеанс не найден' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.sessionsService.findOneOrFail(id);
@@ -39,6 +40,7 @@ export class SessionsApiController {
   @Get(':id/tickets')
   @ApiOperation({ summary: 'Билеты сеанса' })
   @ApiResponse({ status: 200, description: 'Список билетов сеанса' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Сеанс не найден' })
   getTickets(@Param('id', ParseIntPipe) id: number) {
     return this.sessionsService.findTickets(id);
@@ -59,6 +61,7 @@ export class SessionsApiController {
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить сеанс' })
   @ApiResponse({ status: 200, description: 'Сеанс обновлён' })
+  @ApiResponse({ status: 400, description: 'Ошибка валидации или ID не число' })
   @ApiResponse({ status: 404, description: 'Сеанс не найден' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateSessionDto) {
     return this.sessionsService.update(id, {
@@ -72,6 +75,7 @@ export class SessionsApiController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить сеанс' })
   @ApiResponse({ status: 204, description: 'Сеанс удалён' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Сеанс не найден' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.sessionsService.remove(id);

@@ -31,6 +31,7 @@ export class FilmsApiController {
   @Get(':id')
   @ApiOperation({ summary: 'Фильм по ID' })
   @ApiResponse({ status: 200, description: 'Фильм найден' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.filmsService.findOneOrFail(id);
@@ -39,6 +40,7 @@ export class FilmsApiController {
   @Get(':id/sessions')
   @ApiOperation({ summary: 'Сеансы фильма' })
   @ApiResponse({ status: 200, description: 'Список сеансов фильма' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   getSessions(@Param('id', ParseIntPipe) id: number) {
     return this.filmsService.findSessions(id);
@@ -47,6 +49,7 @@ export class FilmsApiController {
   @Get(':id/reviews')
   @ApiOperation({ summary: 'Отзывы о фильме' })
   @ApiResponse({ status: 200, description: 'Список отзывов о фильме' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   getReviews(@Param('id', ParseIntPipe) id: number) {
     return this.filmsService.findReviews(id);
@@ -63,6 +66,7 @@ export class FilmsApiController {
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить фильм' })
   @ApiResponse({ status: 200, description: 'Фильм обновлён' })
+  @ApiResponse({ status: 400, description: 'Ошибка валидации или ID не число' })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateFilmDto) {
     return this.filmsService.update(id, dto);
@@ -72,6 +76,7 @@ export class FilmsApiController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить фильм' })
   @ApiResponse({ status: 204, description: 'Фильм удалён' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
   @ApiResponse({ status: 404, description: 'Фильм не найден' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.filmsService.remove(id);
