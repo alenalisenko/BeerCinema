@@ -4,10 +4,12 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateSessionDto {
   @ApiProperty({ example: 1, description: 'ID фильма' })
   @IsInt()
+  @Min(1)
   filmId: number;
 
   @ApiProperty({ example: 1, description: 'ID зала' })
   @IsInt()
+  @Min(1)
   hallId: number;
 
   @ApiProperty({ example: '2026-03-15T09:00:00.000Z' })
