@@ -19,6 +19,7 @@ import { ReviewsModule } from './reviews/reviews.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       introspection: true,
+      playground: true,
       csrfPrevention: false,
       validationRules: [depthLimit(5)],
     }),
