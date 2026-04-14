@@ -4,6 +4,7 @@ import type { Response } from 'express';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { TicketEntity, PaginatedTicketsEntity } from './entities/ticket.entity';
 
 @ApiTags('tickets')
 @Controller('api/tickets')
@@ -14,7 +15,7 @@ export class TicketsApiController {
   @ApiOperation({ summary: 'Список билетов с пагинацией' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
-  @ApiResponse({ status: 200, description: 'Список билетов с метаданными пагинации' })
+  @ApiResponse({ status: 200, description: 'Список билетов с метаданными пагинации', type: PaginatedTicketsEntity })
   async findAll(
     @Query('page') page = '1',
     @Query('limit') limit = '10',
@@ -30,26 +31,26 @@ export class TicketsApiController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Билет по ID' })
-  @ApiResponse({ status: 200, description: 'Билет найден' })
-  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
-  @ApiResponse({ status: 404, description: 'Билет не найден' })
+  @ApiResponse({ status: 200, description: 'Билет найден', type: TicketEntity })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом', schema: { example: { statusCode: 400, message: 'Validation failed (numeric string is expected)', error: 'Bad Request' } } })
+  @ApiResponse({ status: 404, description: 'Билет не найден', schema: { example: { statusCode: 404, message: 'Запись не найдена' } } })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.ticketsService.findOneOrFail(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Создать билет (забронировать место)' })
-  @ApiResponse({ status: 201, description: 'Билет создан', type: CreateTicketDto })
-  @ApiResponse({ status: 400, description: 'Место уже занято или ошибка валидации' })
+  @ApiResponse({ status: 201, description: 'Билет создан', type: TicketEntity })
+  @ApiResponse({ status: 400, description: 'Место уже занято или ошибка валидации', schema: { example: { statusCode: 400, message: 'Запись с такими данными уже существует' } } })
   create(@Body() dto: CreateTicketDto) {
     return this.ticketsService.create(dto);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Обновить статус билета' })
-  @ApiResponse({ status: 200, description: 'Статус билета обновлён' })
-  @ApiResponse({ status: 400, description: 'Ошибка валидации или ID не число' })
-  @ApiResponse({ status: 404, description: 'Билет не найден' })
+  @ApiResponse({ status: 200, description: 'Статус билета обновлён', type: TicketEntity })
+  @ApiResponse({ status: 400, description: 'Ошибка валидации или ID не число', schema: { example: { statusCode: 400, message: ['status must be one of the following values: RESERVED, PAID, CANCELLED'], error: 'Bad Request' } } })
+  @ApiResponse({ status: 404, description: 'Билет не найден', schema: { example: { statusCode: 404, message: 'Запись не найдена' } } })
   update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateTicketDto) {
     if (!dto.status) return this.ticketsService.findOneOrFail(id);
     return this.ticketsService.updateStatus(id, dto.status);
@@ -59,8 +60,8 @@ export class TicketsApiController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Удалить билет' })
   @ApiResponse({ status: 204, description: 'Билет удалён' })
-  @ApiResponse({ status: 400, description: 'ID должен быть числом' })
-  @ApiResponse({ status: 404, description: 'Билет не найден' })
+  @ApiResponse({ status: 400, description: 'ID должен быть числом', schema: { example: { statusCode: 400, message: 'Validation failed (numeric string is expected)', error: 'Bad Request' } } })
+  @ApiResponse({ status: 404, description: 'Билет не найден', schema: { example: { statusCode: 404, message: 'Запись не найдена' } } })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.ticketsService.remove(id);
   }
