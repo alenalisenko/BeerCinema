@@ -5,7 +5,7 @@
 <div class="bg-white shadow rounded-lg p-6 max-w-2xl mx-auto">
     <h2 class="text-2xl font-bold mb-6">Добавить фильм</h2>
 
-    <form method="POST" action="/films">
+    <form method="POST" action="/films" enctype="multipart/form-data">
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Название *</label>
             <input type="text" name="title" required class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
@@ -35,8 +35,11 @@
             </div>
         </div>
         <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1">URL постера *</label>
-            <input type="text" name="posterUrl" required placeholder="/assets/images/film.png" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Постер</label>
+            <input type="file" name="poster" accept="image/jpeg,image/png,image/webp"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-yellow-100 file:text-yellow-700">
+            <p class="text-xs text-gray-400 mt-1">или укажите URL вручную:</p>
+            <input type="text" name="posterUrl" placeholder="https://example.com/poster.jpg" class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
         <div class="flex gap-3">
             <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-6 rounded">Добавить</button>

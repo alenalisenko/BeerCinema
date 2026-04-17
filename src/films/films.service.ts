@@ -70,11 +70,13 @@ export class FilmsService {
     description: string;
     duration: number;
     genre: string;
-    posterUrl: string;
+    posterUrl?: string;
     releaseYear: number;
     rating?: number;
   }) {
-    return this.prisma.film.create({ data });
+    return this.prisma.film.create({
+      data: { ...data, posterUrl: data.posterUrl ?? '' },
+    });
   }
 
   async update(id: number, data: Partial<{

@@ -1,17 +1,33 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, Query, ParseIntPipe, HttpCode, HttpStatus, Res } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import 'multer';
+import {
+  Controller, Get, Post, Patch, Delete,
+  Param, Body, Query, ParseIntPipe,
+  HttpCode, HttpStatus, Res, Header, UseInterceptors, UploadedFile,
+  ParseFilePipe, MaxFileSizeValidator, FileTypeValidator,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiConsumes, ApiBody } from '@nestjs/swagger';
+import { CacheInterceptor } from '@nestjs/cache-manager';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { FilmsService } from './films.service';
 import { CreateFilmDto } from './dto/create-film.dto';
 import { UpdateFilmDto } from './dto/update-film.dto';
 import { FilmEntity, PaginatedFilmsEntity } from './entities/film.entity';
+import { ETagInterceptor } from '../common/interceptors/etag.interceptor';
+import { StorageService } from '../storage/storage.service';
 
 @ApiTags('films')
 @Controller('api/films')
+@UseInterceptors(ETagInterceptor)
 export class FilmsApiController {
-  constructor(private readonly filmsService: FilmsService) {}
+  constructor(
+    private readonly filmsService: FilmsService,
+    private readonly storageService: StorageService,
+  ) {}
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
+  @Header('Cache-Control', 'public, max-age=3600')
   @ApiOperation({ summary: 'Список фильмов с пагинацией' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
   @ApiQuery({ name: 'limit', required: false, example: 10 })
@@ -30,6 +46,8 @@ export class FilmsApiController {
   }
 
   @Get(':id')
+  @UseInterceptors(CacheInterceptor)
+  @Header('Cache-Control', 'public, max-age=3600')
   @ApiOperation({ summary: 'Фильм по ID' })
   @ApiResponse({ status: 200, description: 'Фильм найден', type: FilmEntity })
   @ApiResponse({ status: 400, description: 'ID должен быть числом', schema: { example: { statusCode: 400, message: 'Validation failed (numeric string is expected)', error: 'Bad Request' } } })
@@ -62,6 +80,28 @@ export class FilmsApiController {
   @ApiResponse({ status: 400, description: 'Ошибка валидации', schema: { example: { statusCode: 400, message: ['title should not be empty', 'duration must be an integer number'], error: 'Bad Request' } } })
   create(@Body() dto: CreateFilmDto) {
     return this.filmsService.create(dto);
+  }
+
+  @Post(':id/poster')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ schema: { type: 'object', properties: { file: { type: 'string', format: 'binary', description: 'Файл постера (jpg/png/webp, до 5 МБ)' } } } })
+  @ApiOperation({ summary: 'Загрузить постер фильма в облако' })
+  @ApiResponse({ status: 201, description: 'Постер загружен', type: FilmEntity })
+  @ApiResponse({ status: 400, description: 'Неверный файл или ID', schema: { example: { statusCode: 400, message: 'File is required' } } })
+  @ApiResponse({ status: 404, description: 'Фильм не найден', schema: { example: { statusCode: 404, message: 'Запись не найдена' } } })
+  async uploadPoster(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile(new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+        new FileTypeValidator({ fileType: /image\/(jpeg|png|webp)/ }),
+      ],
+    }))
+    file: Express.Multer.File,
+  ) {
+    const posterUrl = await this.storageService.upload(file);
+    return this.filmsService.update(id, { posterUrl });
   }
 
   @Patch(':id')

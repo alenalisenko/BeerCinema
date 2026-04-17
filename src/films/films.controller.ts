@@ -1,11 +1,17 @@
-import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect } from '@nestjs/common';
+import 'multer';
+import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { FilmsService } from './films.service';
+import { StorageService } from '../storage/storage.service';
 
 @ApiExcludeController()
 @Controller('films')
 export class FilmsController {
-  constructor(private readonly filmsService: FilmsService) {}
+  constructor(
+    private readonly filmsService: FilmsService,
+    private readonly storageService: StorageService,
+  ) {}
 
   private getUser(auth?: string) {
     return auth === 'true' ? { name: 'Алёна Лисенко' } : null;
@@ -44,14 +50,22 @@ export class FilmsController {
 
   // POST /films — создать + редирект на /films
   @Post()
+  @UseInterceptors(FileInterceptor('poster'))
   @Redirect('/films', 302)
-  async create(@Body() body: any) {
+  async create(
+    @Body() body: any,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const posterUrl = file
+      ? await this.storageService.upload(file)
+      : body.posterUrl;
+
     await this.filmsService.create({
       title: body.title,
       description: body.description,
       duration: parseInt(body.duration),
       genre: body.genre,
-      posterUrl: body.posterUrl,
+      posterUrl,
       releaseYear: parseInt(body.releaseYear),
       rating: body.rating ? parseFloat(body.rating) : undefined,
     });
@@ -59,14 +73,23 @@ export class FilmsController {
 
   // POST /films/:id/update — обновить + редирект на /films/:id
   @Post(':id/update')
+  @UseInterceptors(FileInterceptor('poster'))
   @Redirect()
-  async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: any,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const posterUrl = file
+      ? await this.storageService.upload(file)
+      : body.posterUrl || undefined;
+
     await this.filmsService.update(id, {
       title: body.title,
       description: body.description,
       duration: body.duration ? parseInt(body.duration) : undefined,
       genre: body.genre,
-      posterUrl: body.posterUrl,
+      posterUrl,
       releaseYear: body.releaseYear ? parseInt(body.releaseYear) : undefined,
       rating: body.rating ? parseFloat(body.rating) : undefined,
     });

@@ -6,7 +6,7 @@
     <h2 class="text-2xl font-bold mb-6">Редактировать фильм</h2>
 
     {{#if film}}
-    <form method="POST" action="/films/{{film.id}}/update">
+    <form method="POST" action="/films/{{film.id}}/update" enctype="multipart/form-data">
         <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Название</label>
             <input type="text" name="title" value="{{film.title}}" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
@@ -36,8 +36,14 @@
             </div>
         </div>
         <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1">URL постера</label>
-            <input type="text" name="posterUrl" value="{{film.posterUrl}}" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Постер</label>
+            {{#if film.posterUrl}}
+            <img src="{{film.posterUrl}}" alt="Текущий постер" class="h-24 rounded mb-2 object-cover">
+            {{/if}}
+            <input type="file" name="poster" accept="image/jpeg,image/png,image/webp"
+                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-yellow-100 file:text-yellow-700">
+            <p class="text-xs text-gray-400 mt-1">или оставьте/измените URL вручную:</p>
+            <input type="text" name="posterUrl" value="{{film.posterUrl}}" class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
         </div>
         <div class="flex gap-3">
             <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-6 rounded">Сохранить</button>

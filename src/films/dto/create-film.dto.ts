@@ -22,10 +22,10 @@ export class CreateFilmDto {
   @IsNotEmpty()
   genre: string;
 
-  @ApiProperty({ example: 'https://example.com/poster.jpg', description: 'URL постера' })
+  @ApiPropertyOptional({ example: 'https://example.com/poster.jpg', description: 'URL постера (если не загружается файл)' })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  posterUrl: string;
+  posterUrl?: string;
 
   @ApiProperty({ example: 2000, description: 'Год выпуска (1888–2100)' })
   @IsInt()
