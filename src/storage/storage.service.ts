@@ -1,6 +1,6 @@
 import 'multer';
 import { Injectable } from '@nestjs/common';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class StorageService {
@@ -15,19 +15,63 @@ export class StorageService {
 
   private readonly bucket = process.env.YANDEX_BUCKET!;
 
-  async upload(file: Express.Multer.File): Promise<string> {
-    const ext = file.originalname.split('.').pop();
-    const key = `films/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  async uploadBuffer(
+    buffer: Buffer,
+    originalName: string,
+    contentType: string,
+    keyPrefix = 'films',
+  ): Promise<string> {
+    const ext = originalName.split('.').pop();
+    const key = `${keyPrefix}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
     await this.s3.send(
       new PutObjectCommand({
         Bucket: this.bucket,
         Key: key,
-        Body: file.buffer,
-        ContentType: file.mimetype,
+        Body: buffer,
+        ContentType: contentType,
       }),
     );
 
     return `https://${this.bucket}.storage.yandexcloud.net/${key}`;
+  }
+
+  private getManagedObjectKey(url?: string | null): string | null {
+    if (!url) return null;
+
+    const virtualHostedPrefix = `https://${this.bucket}.storage.yandexcloud.net/`;
+    if (url.startsWith(virtualHostedPrefix)) {
+      return decodeURIComponent(url.slice(virtualHostedPrefix.length));
+    }
+
+    const pathStylePrefix = `https://storage.yandexcloud.net/${this.bucket}/`;
+    if (url.startsWith(pathStylePrefix)) {
+      return decodeURIComponent(url.slice(pathStylePrefix.length));
+    }
+
+    return null;
+  }
+
+  async upload(file: Express.Multer.File): Promise<string> {
+    return this.uploadBuffer(
+      file.buffer,
+      file.originalname,
+      file.mimetype,
+      'films',
+    );
+  }
+
+  async deleteByUrl(url?: string | null): Promise<boolean> {
+    const key = this.getManagedObjectKey(url);
+    if (!key) return false;
+
+    await this.s3.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      }),
+    );
+
+    return true;
   }
 }

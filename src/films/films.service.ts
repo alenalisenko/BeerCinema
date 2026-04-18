@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class FilmsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private storageService: StorageService,
+  ) {}
 
   async findAll() {
     return this.prisma.film.findMany({
@@ -88,16 +92,42 @@ export class FilmsService {
     releaseYear: number;
     rating: number;
   }>) {
-    return this.prisma.film.update({
+    const existingFilm = await this.findOneOrFail(id);
+    const nextPosterUrl = Object.prototype.hasOwnProperty.call(data, 'posterUrl')
+      ? data.posterUrl
+      : existingFilm.posterUrl;
+
+    const updatedFilm = await this.prisma.film.update({
       where: { id },
       data,
     });
+
+    if (existingFilm.posterUrl && existingFilm.posterUrl !== nextPosterUrl) {
+      try {
+        await this.storageService.deleteByUrl(existingFilm.posterUrl);
+      } catch (error) {
+        console.error('[Storage] Failed to delete old poster after film update:', error);
+      }
+    }
+
+    return updatedFilm;
   }
 
   async remove(id: number) {
-    return this.prisma.film.delete({
+    const film = await this.findOneOrFail(id);
+    const deletedFilm = await this.prisma.film.delete({
       where: { id },
     });
+
+    if (film.posterUrl) {
+      try {
+        await this.storageService.deleteByUrl(film.posterUrl);
+      } catch (error) {
+        console.error('[Storage] Failed to delete poster after film removal:', error);
+      }
+    }
+
+    return deletedFilm;
   }
 
   async findOneOrFail(id: number) {
