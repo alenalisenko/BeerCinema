@@ -23,6 +23,7 @@ import { TimingInterceptor } from './common/interceptors/timing.interceptor';
       introspection: true,
       playground: true,
       csrfPrevention: false,
+      context: ({ req, res }) => ({ req, res }),
       validationRules: [depthLimit(5)],
     }),
     PrismaModule,
