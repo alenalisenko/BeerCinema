@@ -20,9 +20,10 @@ export class CreateFilmInput {
   @IsString()
   genre: string;
 
-  @Field({ description: 'URL постера' })
+  @Field({ nullable: true, description: 'URL постера' })
+  @IsOptional()
   @IsString()
-  posterUrl: string;
+  posterUrl?: string;
 
   @Field(() => Int, { description: 'Год выхода' })
   @IsInt()

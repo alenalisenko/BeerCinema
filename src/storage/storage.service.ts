@@ -1,7 +1,6 @@
 import 'multer';
 import { Injectable } from '@nestjs/common';
-import { S3Client } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 @Injectable()
 export class StorageService {
@@ -20,16 +19,14 @@ export class StorageService {
     const ext = file.originalname.split('.').pop();
     const key = `films/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
 
-    await new Upload({
-      client: this.s3,
-      params: {
+    await this.s3.send(
+      new PutObjectCommand({
         Bucket: this.bucket,
         Key: key,
         Body: file.buffer,
         ContentType: file.mimetype,
-        ACL: 'public-read',
-      },
-    }).done();
+      }),
+    );
 
     return `https://${this.bucket}.storage.yandexcloud.net/${key}`;
   }

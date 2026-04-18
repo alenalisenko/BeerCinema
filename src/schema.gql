@@ -13,7 +13,7 @@ input CreateFilmInput {
   genre: String!
 
   """URL постера"""
-  posterUrl: String!
+  posterUrl: String
 
   """Рейтинг от 1.0 до 5.0"""
   rating: Float
