@@ -23,7 +23,7 @@ export class AppController {
       return {
         title: film.title,
         time: firstSession ? this.formatTime(firstSession.startTime) : '',
-        image: film.posterUrl.replace('/assets/images/', ''),
+        posterUrl: film.posterUrl,
       };
     });
 
