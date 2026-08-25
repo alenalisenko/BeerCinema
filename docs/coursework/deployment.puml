@@ -1,0 +1,30 @@
+@startuml
+title Диаграмма развертывания BeerCinema
+
+node "Устройство пользователя" {
+  artifact "Браузер" as Browser
+}
+
+node "Render.com" {
+  node "Web Service (Node.js 22)" {
+    artifact "Приложение NestJS" as App
+    artifact "MVC (Handlebars)" as MVC
+    artifact "REST API + Swagger" as REST
+    artifact "GraphQL (Apollo)" as GQL
+  }
+  database "PostgreSQL" as DB
+}
+
+cloud "Yandex Cloud" {
+  node "Object Storage" as S3 {
+    artifact "Бакет beer-cinema\n(постеры фильмов)" as Bucket
+  }
+}
+
+Browser --> MVC : HTTPS (HTML)
+Browser --> REST : HTTPS (JSON)
+Browser --> GQL : HTTPS (GraphQL)
+App --> DB : TCP 5432 (Prisma / pg)
+App --> S3 : HTTPS (S3 API)
+Browser --> Bucket : HTTPS (получение постеров)
+@enduml

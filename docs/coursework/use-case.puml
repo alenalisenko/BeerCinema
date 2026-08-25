@@ -1,0 +1,49 @@
+@startuml
+title Диаграмма вариантов использования BeerCinema
+
+left to right direction
+skinparam actorStyle awesome
+
+actor "Гость" as Guest
+actor "Клиент" as Client
+actor "Менеджер" as Manager
+actor "Администратор" as Admin
+
+Client --|> Guest
+Manager --|> Client
+Admin --|> Manager
+
+rectangle "BeerCinema" {
+  usecase "Просмотр каталога фильмов" as UC1
+  usecase "Просмотр расписания сеансов" as UC2
+  usecase "Просмотр отзывов" as UC3
+  usecase "Регистрация / вход" as UC4
+  usecase "Бронирование билета" as UC5
+  usecase "Оплата билета" as UC6
+  usecase "Отмена билета" as UC7
+  usecase "Написание отзыва" as UC8
+  usecase "Управление фильмами\n(создание, изменение, удаление)" as UC9
+  usecase "Загрузка постера фильма" as UC10
+  usecase "Управление расписанием сеансов" as UC11
+  usecase "Управление пользователями\nи ролями" as UC12
+}
+
+Guest --> UC1
+Guest --> UC2
+Guest --> UC3
+Guest --> UC4
+
+Client --> UC5
+Client --> UC6
+Client --> UC7
+Client --> UC8
+
+Manager --> UC9
+Manager --> UC10
+Manager --> UC11
+
+Admin --> UC12
+
+UC6 ..> UC5 : <<extend>>
+UC10 ..> UC9 : <<include>>
+@enduml
