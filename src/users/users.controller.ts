@@ -1,51 +1,53 @@
-import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { Roles } from '../auth/roles.decorator';
+import { PageAuthGuard } from '../auth/page-auth.guard';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { SessionUser } from '../auth/session-user';
 
 type Role = 'CLIENT' | 'ADMIN' | 'MANAGER';
 
 @ApiExcludeController()
+@UseGuards(PageAuthGuard)
+@Roles('ADMIN')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  private getUser(auth?: string) {
-    return auth === 'true' ? { name: 'Алёна Лисенко' } : null;
-  }
-
   // GET /users — список пользователей
   @Get()
   @Render('users/index')
-  async index(@Query('auth') auth?: string, @Query('email') email?: string) {
+  async index(@CurrentUser() user: SessionUser | null, @Query('email') email?: string) {
     const users = email
       ? await this.usersService.findByEmail(email)
       : await this.usersService.findAll();
-    return { title: 'Пользователи', user: this.getUser(auth), users };
+    return { title: 'Пользователи', user, users };
   }
 
   // GET /users/add — форма создания
   @Get('add')
   @Render('users/add')
-  addForm(@Query('auth') auth?: string) {
+  addForm(@CurrentUser() user: SessionUser | null) {
     const roles: Role[] = ['CLIENT', 'ADMIN', 'MANAGER'];
-    return { title: 'Добавить пользователя', user: this.getUser(auth), roles };
+    return { title: 'Добавить пользователя', user, roles };
   }
 
   // GET /users/:id/edit — форма редактирования
   @Get(':id/edit')
   @Render('users/edit')
-  async editForm(@Param('id', ParseIntPipe) id: number, @Query('auth') auth?: string) {
+  async editForm(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: SessionUser | null) {
     const userData = await this.usersService.findOne(id);
     const roles: Role[] = ['CLIENT', 'ADMIN', 'MANAGER'];
-    return { title: 'Редактировать пользователя', user: this.getUser(auth), userData, roles };
+    return { title: 'Редактировать пользователя', user, userData, roles };
   }
 
   // GET /users/:id — страница пользователя
   @Get(':id')
   @Render('users/show')
-  async show(@Param('id', ParseIntPipe) id: number, @Query('auth') auth?: string) {
+  async show(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: SessionUser | null) {
     const userData = await this.usersService.findOne(id);
-    return { title: userData?.name ?? 'Пользователь', user: this.getUser(auth), userData };
+    return { title: userData?.name ?? 'Пользователь', user, userData };
   }
 
   // POST /users — создать + редирект на /users

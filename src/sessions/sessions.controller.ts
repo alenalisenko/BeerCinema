@@ -1,7 +1,11 @@
-import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, Sse, MessageEvent } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, Sse, MessageEvent, UseGuards } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { SessionsService } from './sessions.service';
 import { FilmsService } from '../films/films.service';
+import { Roles } from '../auth/roles.decorator';
+import { PageAuthGuard } from '../auth/page-auth.guard';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { SessionUser } from '../auth/session-user';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -13,10 +17,6 @@ export class SessionsController {
     private readonly filmsService: FilmsService,
   ) {}
 
-  private getUser(auth?: string) {
-    return auth === 'true' ? { name: 'Алёна Лисенко' } : null;
-  }
-
   private formatDateTime(date: Date): string {
     return new Date(date).toLocaleString('ru-RU', {
       day: '2-digit', month: '2-digit', year: 'numeric',
@@ -27,7 +27,7 @@ export class SessionsController {
   // GET /sessions — список сеансов
   @Get()
   @Render('sessions/index')
-  async index(@Query('auth') auth?: string, @Query('filmId') filmId?: string, @Query('date') date?: string) {
+  async index(@CurrentUser() user: SessionUser | null, @Query('filmId') filmId?: string, @Query('date') date?: string) {
     const sessions = filmId
       ? await this.sessionsService.findByFilm(parseInt(filmId))
       : date
@@ -39,26 +39,30 @@ export class SessionsController {
       startTimeFormatted: this.formatDateTime(s.startTime),
       endTimeFormatted: this.formatDateTime(s.endTime),
     }));
-    return { title: 'Сеансы', user: this.getUser(auth), sessions: formatted };
+    return { title: 'Сеансы', user, sessions: formatted };
   }
 
   // GET /sessions/add — форма создания
   @Get('add')
+  @UseGuards(PageAuthGuard)
+  @Roles('MANAGER', 'ADMIN')
   @Render('sessions/add')
-  async addForm(@Query('auth') auth?: string) {
+  async addForm(@CurrentUser() user: SessionUser | null) {
     const films = await this.filmsService.findAll();
     const halls = await this.sessionsService.findAllHalls();
-    return { title: 'Добавить сеанс', user: this.getUser(auth), films, halls };
+    return { title: 'Добавить сеанс', user, films, halls };
   }
 
   // GET /sessions/:id/edit — форма редактирования
   @Get(':id/edit')
+  @UseGuards(PageAuthGuard)
+  @Roles('MANAGER', 'ADMIN')
   @Render('sessions/edit')
-  async editForm(@Param('id', ParseIntPipe) id: number, @Query('auth') auth?: string) {
+  async editForm(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: SessionUser | null) {
     const session = await this.sessionsService.findOne(id);
     const films = await this.filmsService.findAll();
     const halls = await this.sessionsService.findAllHalls();
-    return { title: 'Редактировать сеанс', user: this.getUser(auth), session, films, halls };
+    return { title: 'Редактировать сеанс', user, session, films, halls };
   }
 
   // GET /sessions/events — SSE-стрим событий
@@ -72,18 +76,20 @@ export class SessionsController {
   // GET /sessions/:id — страница сеанса
   @Get(':id')
   @Render('sessions/show')
-  async show(@Param('id', ParseIntPipe) id: number, @Query('auth') auth?: string) {
+  async show(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: SessionUser | null) {
     const session = await this.sessionsService.findOne(id);
     const formatted = session ? {
       ...session,
       startTimeFormatted: this.formatDateTime(session.startTime),
       endTimeFormatted: this.formatDateTime(session.endTime),
     } : null;
-    return { title: 'Сеанс', user: this.getUser(auth), session: formatted };
+    return { title: 'Сеанс', user, session: formatted };
   }
 
   // POST /sessions — создать → редирект на /sessions
   @Post()
+  @UseGuards(PageAuthGuard)
+  @Roles('MANAGER', 'ADMIN')
   @Redirect('/sessions', 302)
   async create(@Body() body: any) {
     await this.sessionsService.create({
@@ -97,6 +103,8 @@ export class SessionsController {
 
   // POST /sessions/:id/update — обновить → редирект на /sessions/:id
   @Post(':id/update')
+  @UseGuards(PageAuthGuard)
+  @Roles('MANAGER', 'ADMIN')
   @Redirect()
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
     await this.sessionsService.update(id, {
@@ -111,6 +119,8 @@ export class SessionsController {
 
   // POST /sessions/:id/delete — удалить → редирект на /sessions
   @Post(':id/delete')
+  @UseGuards(PageAuthGuard)
+  @Roles('MANAGER', 'ADMIN')
   @Redirect('/sessions', 302)
   async remove(@Param('id', ParseIntPipe) id: number) {
     await this.sessionsService.remove(id);

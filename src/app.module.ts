@@ -12,6 +12,7 @@ import { SessionsModule } from './sessions/sessions.module';
 import { UsersModule } from './users/users.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { AuthModule } from './auth/auth.module';
 import { TimingInterceptor } from './common/interceptors/timing.interceptor';
 
 @Module({
@@ -32,6 +33,7 @@ import { TimingInterceptor } from './common/interceptors/timing.interceptor';
     UsersModule,
     TicketsModule,
     ReviewsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

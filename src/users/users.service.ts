@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 
 type Role = 'CLIENT' | 'ADMIN' | 'MANAGER';
@@ -82,7 +83,7 @@ export class UsersService {
     role?: Role;
   }) {
     return this.prisma.user.create({
-      data,
+      data: { ...data, password: await bcrypt.hash(data.password, 10) },
       select: {
         id: true,
         email: true,
@@ -99,6 +100,9 @@ export class UsersService {
     password: string;
     role: Role;
   }>) {
+    if (data.password) {
+      data = { ...data, password: await bcrypt.hash(data.password, 10) };
+    }
     return this.prisma.user.update({
       where: { id },
       data,

@@ -1,7 +1,9 @@
-import { Controller, Get, Query, Render } from '@nestjs/common';
+import { Controller, Get, Render } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { FilmsService } from './films/films.service';
 import { SessionsService } from './sessions/sessions.service';
+import { CurrentUser } from './auth/current-user.decorator';
+import { SessionUser } from './auth/session-user';
 
 @ApiExcludeController()
 @Controller()
@@ -13,7 +15,7 @@ export class AppController {
 
   @Get()
   @Render('index')
-  async getIndex(@Query('auth') auth?: string) {
+  async getIndex(@CurrentUser() user: SessionUser | null) {
     // Получаем фильмы с сеансами из БД
     const filmsFromDB = await this.filmsService.findAll();
     
@@ -35,8 +37,6 @@ export class AppController {
       hall: session.hall.name,
     }));
 
-    const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
-
     return { 
       title: 'Главная', 
       films, 
@@ -54,22 +54,19 @@ export class AppController {
 
   @Get('about')
   @Render('about')
-  getAbout(@Query('auth') auth?: string) {
-    const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
+  getAbout(@CurrentUser() user: SessionUser | null) {
     return { title: 'О нас', user };
   }
 
   @Get('contacts')
   @Render('contacts')
-  getContacts(@Query('auth') auth?: string) {
-    const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
+  getContacts(@CurrentUser() user: SessionUser | null) {
     return { title: 'Контакты', user };
   }
 
   @Get('constructor')
   @Render('constructor')
-  getConstructor(@Query('auth') auth?: string) {
-    const user = auth === 'true' ? { name: 'Алёна Лисенко' } : null;
+  getConstructor(@CurrentUser() user: SessionUser | null) {
     return { 
       title: 'Конструктор', 
       user,

@@ -6,6 +6,8 @@ import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { join } from 'path';
 import { create } from 'express-handlebars';
+import session from 'express-session';
+import './auth/session-user';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -15,6 +17,17 @@ async function bootstrap() {
 
   // Статические файлы (картинки, CSS, JS)
   app.useStaticAssets(publicPath);
+
+  // Сессии: авторизованный пользователь хранится в server-side сессии,
+  // браузеру уходит только httpOnly-кука с id сессии
+  app.use(
+    session({
+      secret: process.env.SESSION_SECRET ?? 'beercinema-dev-secret',
+      resave: false,
+      saveUninitialized: false,
+      cookie: { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 },
+    }),
+  );
   
   // Handlebars шаблонизатор
   const hbs = create({
