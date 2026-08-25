@@ -4,6 +4,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
+// Требует доступной БД из DATABASE_URL (.env)
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
@@ -16,10 +17,25 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it('/api/films (GET) отдает список фильмов', () => {
     return request(app.getHttpServer())
-      .get('/')
+      .get('/api/films')
       .expect(200)
-      .expect('Hello World!');
+      .expect((res) => {
+        if (!Array.isArray(res.body.data)) {
+          throw new Error('Ожидался массив data в ответе');
+        }
+      });
+  });
+
+  it('/graphql отвечает на запрос', () => {
+    return request(app.getHttpServer())
+      .post('/graphql')
+      .send({ query: '{ __typename }' })
+      .expect(200);
   });
 });
