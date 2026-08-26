@@ -13,7 +13,7 @@
             <select name="sessionId" id="session-select" required>
                 <option value="">— выберите сеанс —</option>
                 {{#each sessions}}
-                <option value="{{id}}" {{#if (eq id ../selectedSessionId)}}selected{{/if}}>{{film.title}} · {{hall.name}} · {{startTimeFormatted}} · {{price}} ₽</option>
+                <option value="{{id}}" data-capacity="{{hall.capacity}}" {{#if (eq id ../selectedSessionId)}}selected{{/if}}>{{film.title}} · {{hall.name}} · {{startTimeFormatted}} · {{price}} ₽</option>
                 {{/each}}
             </select>
         </div>
@@ -29,9 +29,19 @@
         </div>
         {{/if}}
         <div class="field">
-            <label>Место * (например: A1, B12)</label>
-            <input type="text" name="seat" required placeholder="A1" value="{{seat}}">
-            <p class="hint" id="taken-seats"></p>
+            <label>Место *</label>
+            <input type="text" name="seat" id="seat-input" required placeholder="Выберите место на схеме" value="{{seat}}" readonly>
+            <div id="hall-scheme" class="hall-scheme" hidden>
+                <div class="screen-bar"></div>
+                <div class="screen-label">ЭКРАН</div>
+                <div id="seat-map" class="seat-map"></div>
+                <div class="seat-legend">
+                    <span><i class="legend-swatch"></i> свободно</span>
+                    <span><i class="legend-swatch taken"></i> занято</span>
+                    <span><i class="legend-swatch selected"></i> ваш выбор</span>
+                </div>
+            </div>
+            <p class="hint" id="scheme-hint">Выберите сеанс, чтобы увидеть схему зала.</p>
         </div>
         {{#if (isManager user)}}
         <div class="field">
@@ -51,31 +61,80 @@
 </div>
 
 <script>
-// Подсказка занятых мест: при выборе сеанса тянем его билеты из REST API
+// Схема зала: ряды по 10 мест исходя из вместимости зала (data-capacity),
+// занятые места подтягиваются из REST API выбранного сеанса
 (function () {
-    const select = document.getElementById('session-select');
-    const hint = document.getElementById('taken-seats');
+    const SEATS_PER_ROW = 10;
+    const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-    async function loadTakenSeats() {
+    const select = document.getElementById('session-select');
+    const seatInput = document.getElementById('seat-input');
+    const scheme = document.getElementById('hall-scheme');
+    const map = document.getElementById('seat-map');
+    const hint = document.getElementById('scheme-hint');
+
+    async function renderScheme() {
+        const option = select.selectedOptions[0];
         const sessionId = select.value;
-        if (!sessionId) { hint.textContent = ''; return; }
+        const capacity = option ? parseInt(option.dataset.capacity) : 0;
+
+        if (!sessionId || !capacity) {
+            scheme.hidden = true;
+            hint.hidden = false;
+            return;
+        }
+
+        let taken = [];
         try {
             const res = await fetch('/api/sessions/' + sessionId + '/tickets');
-            if (!res.ok) { hint.textContent = ''; return; }
-            const tickets = await res.json();
-            const taken = tickets
-                .filter(t => t.status !== 'CANCELLED')
-                .map(t => t.seat)
-                .sort();
-            hint.textContent = taken.length
-                ? 'Занятые места: ' + taken.join(', ')
-                : 'Все места свободны';
-        } catch {
-            hint.textContent = '';
+            if (res.ok) {
+                const tickets = await res.json();
+                taken = tickets.filter(t => t.status !== 'CANCELLED').map(t => t.seat);
+            }
+        } catch { /* схема остается доступной, просто без занятых мест */ }
+
+        map.textContent = '';
+        const rows = Math.ceil(capacity / SEATS_PER_ROW);
+        let seatNumber = 0;
+
+        for (let r = 0; r < rows; r++) {
+            const rowEl = document.createElement('div');
+            rowEl.className = 'seat-row';
+
+            const label = document.createElement('span');
+            label.className = 'seat-row-label';
+            label.textContent = LETTERS[r];
+            rowEl.appendChild(label);
+
+            for (let s = 1; s <= SEATS_PER_ROW && seatNumber < capacity; s++, seatNumber++) {
+                const code = LETTERS[r] + s;
+                const seat = document.createElement('button');
+                seat.type = 'button';
+                seat.className = 'seat';
+                seat.textContent = s;
+                seat.title = 'Место ' + code;
+
+                if (taken.includes(code)) {
+                    seat.classList.add('taken');
+                    seat.disabled = true;
+                } else {
+                    if (seatInput.value === code) seat.classList.add('selected');
+                    seat.addEventListener('click', () => {
+                        map.querySelectorAll('.seat.selected').forEach(el => el.classList.remove('selected'));
+                        seat.classList.add('selected');
+                        seatInput.value = code;
+                    });
+                }
+                rowEl.appendChild(seat);
+            }
+            map.appendChild(rowEl);
         }
+
+        scheme.hidden = false;
+        hint.hidden = true;
     }
 
-    select.addEventListener('change', loadTakenSeats);
-    loadTakenSeats();
+    select.addEventListener('change', () => { seatInput.value = ''; renderScheme(); });
+    renderScheme();
 })();
 </script>
