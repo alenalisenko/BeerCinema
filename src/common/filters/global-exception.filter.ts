@@ -13,6 +13,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
 
     const response = host.switchToHttp().getResponse<Response>();
+    // Ответ мог уже уйти клиенту (например, redirect из guard'а) — второй раз не пишем
+    if (response.headersSent) return;
     const { status, body } = this.toHttpError(exception);
     return response.status(status).json(body);
   }

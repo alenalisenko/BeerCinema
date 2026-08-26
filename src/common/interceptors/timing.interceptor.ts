@@ -28,7 +28,10 @@ export class TimingInterceptor implements NestInterceptor {
         }
 
         const response = context.switchToHttp().getResponse();
-        response.setHeader('X-Elapsed-Time', `${elapsed}ms`);
+        // Ответ мог уже уйти клиенту (redirect из guard'а или @Res() в контроллере)
+        if (!response.headersSent) {
+          response.setHeader('X-Elapsed-Time', `${elapsed}ms`);
+        }
 
         // Detect @Render() routes — inject serverElapsed into template context
         const isTemplate = !!this.reflector.get('__renderTemplate__', context.getHandler());
