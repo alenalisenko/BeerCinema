@@ -11,12 +11,14 @@
             <p class="muted">{{film.genre}} · {{film.releaseYear}} · {{film.duration}} мин.</p>
             {{#if film.rating}}<p class="rating rating-lg">★ {{film.rating}}</p>{{/if}}
             <p>{{film.description}}</p>
+            {{#if (isManager user)}}
             <div class="form-actions">
                 <a href="/films/{{film.id}}/edit" class="btn">Редактировать</a>
                 <form method="POST" action="/films/{{film.id}}/delete" onsubmit="return confirm('Удалить фильм?')">
                     <button type="submit" class="btn btn-danger">Удалить</button>
                 </form>
             </div>
+            {{/if}}
         </div>
     </div>
 </div>

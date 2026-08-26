@@ -1,6 +1,6 @@
 <div class="page-head">
     <h2>Фильмы</h2>
-    <a href="/films/add" class="btn">+ Добавить фильм</a>
+    {{#if (isManager user)}}<a href="/films/add" class="btn">+ Добавить фильм</a>{{/if}}
 </div>
 
 {{#if films.length}}
@@ -16,12 +16,12 @@
             {{#if rating}}<span class="rating">★ {{rating}}</span>{{/if}}
             <div class="film-card-actions">
                 <a href="/films/{{id}}" class="btn btn-sm">Подробнее</a>
-                <a href="/films/{{id}}/edit" class="btn btn-ghost btn-sm">Изменить</a>
+                {{#if (isManager ../user)}}<a href="/films/{{id}}/edit" class="btn btn-ghost btn-sm">Изменить</a>{{/if}}
             </div>
         </div>
     </div>
     {{/each}}
 </div>
 {{else}}
-<div class="empty-state">Фильмов пока нет. <a href="/films/add">Добавить первый</a></div>
+<div class="empty-state">Фильмов пока нет.{{#if (isManager user)}} <a href="/films/add">Добавить первый</a>{{/if}}</div>
 {{/if}}

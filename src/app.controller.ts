@@ -24,29 +24,32 @@ export class AppController {
       const firstSession = film.sessions[0];
       return {
         title: film.title,
-        time: firstSession ? this.formatTime(firstSession.startTime) : '',
+        time: firstSession ? this.formatDate(firstSession.startTime) : '',
         posterUrl: film.posterUrl,
       };
     });
 
-    // Получаем расписание на сегодня
-    const sessions = await this.sessionsService.findByDate(new Date());
+    // Ближайшие сеансы для афиши
+    const sessions = await this.sessionsService.findUpcoming(8);
     const schedule = sessions.map(session => ({
       film: session.film.title,
-      time: this.formatTime(session.startTime),
+      time: this.formatDate(session.startTime),
       hall: session.hall.name,
     }));
 
-    return { 
-      title: 'Главная', 
-      films, 
-      schedule, 
+    return {
+      title: 'Главная',
+      films,
+      schedule,
+      useSwiper: true,
       user
     };
   }
 
-  private formatTime(date: Date): string {
-    return new Date(date).toLocaleTimeString('ru-RU', {
+  private formatDate(date: Date): string {
+    return new Date(date).toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
     });

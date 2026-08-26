@@ -1,6 +1,6 @@
 <div class="page-head">
     <h2>Сеансы</h2>
-    <a href="/sessions/add" class="btn">+ Добавить сеанс</a>
+    {{#if (isManager user)}}<a href="/sessions/add" class="btn">+ Добавить сеанс</a>{{/if}}
 </div>
 
 <div id="sse-status" class="sse-status">● подключение к обновлениям...</div>
@@ -29,7 +29,7 @@
                 <td>
                     <div class="row-actions">
                         <a href="/sessions/{{id}}">Подробнее</a>
-                        <a href="/sessions/{{id}}/edit" class="secondary">Изменить</a>
+                        {{#if (isManager ../user)}}<a href="/sessions/{{id}}/edit" class="secondary">Изменить</a>{{/if}}
                     </div>
                 </td>
             </tr>
@@ -38,7 +38,7 @@
     </table>
 </div>
 {{else}}
-<div class="empty-state">Сеансов пока нет. <a href="/sessions/add">Добавить первый</a></div>
+<div class="empty-state">Сеансов пока нет.{{#if (isManager user)}} <a href="/sessions/add">Добавить первый</a>{{/if}}</div>
 {{/if}}
 
 <script>

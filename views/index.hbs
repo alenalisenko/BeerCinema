@@ -7,21 +7,28 @@
 <section class="mt-6">
     <h3 class="section-h">Ближайшие показы</h3>
 
-    <div class="films-grid">
-        {{#each films}}
-        <div class="film-card">
-            <div class="poster-wrap">
-                <img src="{{posterUrl}}" alt="{{title}}">
-            </div>
-            <div class="film-card-body">
-                <h3>{{title}}</h3>
-                {{#if time}}<p class="film-meta">Ближайший сеанс: {{time}}</p>{{/if}}
-                <div class="film-card-actions">
-                    <a href="/tickets/add" class="btn btn-sm">Купить билет</a>
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            {{#each films}}
+            <div class="swiper-slide">
+                <div class="film-card">
+                    <div class="poster-wrap">
+                        <img src="{{posterUrl}}" alt="{{title}}">
+                    </div>
+                    <div class="film-card-body">
+                        <h3>{{title}}</h3>
+                        {{#if time}}<p class="film-meta">Ближайший сеанс: {{time}}</p>{{/if}}
+                        <div class="film-card-actions">
+                            <a href="/tickets/add" class="btn btn-sm">Купить билет</a>
+                        </div>
+                    </div>
                 </div>
             </div>
+            {{/each}}
         </div>
-        {{/each}}
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-pagination"></div>
     </div>
 </section>
 
@@ -42,6 +49,10 @@
                     <td>{{film}}</td>
                     <td>{{time}}</td>
                     <td>{{hall}}</td>
+                </tr>
+                {{else}}
+                <tr>
+                    <td colspan="3" class="text-center muted">Сеансов пока нет — загляните позже</td>
                 </tr>
                 {{/each}}
             </tbody>

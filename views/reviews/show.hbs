@@ -18,12 +18,14 @@
     </div>
     <p class="kv-label">Комментарий</p>
     <p>{{review.comment}}</p>
+    {{#if user}}
     <div class="form-actions">
         <a href="/reviews/{{review.id}}/edit" class="btn">Редактировать</a>
         <form method="POST" action="/reviews/{{review.id}}/delete" onsubmit="return confirm('Удалить отзыв?')">
             <button type="submit" class="btn btn-danger">Удалить</button>
         </form>
     </div>
+    {{/if}}
 </div>
 {{else}}
 <div class="empty-state">Отзыв не найден.</div>

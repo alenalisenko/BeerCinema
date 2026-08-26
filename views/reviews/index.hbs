@@ -1,6 +1,6 @@
 <div class="page-head">
     <h2>Отзывы</h2>
-    <a href="/reviews/add" class="btn">+ Добавить отзыв</a>
+    {{#if user}}<a href="/reviews/add" class="btn">+ Добавить отзыв</a>{{/if}}
 </div>
 
 {{#if reviews.length}}
@@ -20,5 +20,5 @@
 </div>
 {{/each}}
 {{else}}
-<div class="empty-state">Отзывов пока нет. <a href="/reviews/add">Добавить первый</a></div>
+<div class="empty-state">Отзывов пока нет.{{#if user}} <a href="/reviews/add">Добавить первый</a>{{/if}}</div>
 {{/if}}

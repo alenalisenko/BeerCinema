@@ -37,6 +37,9 @@ async function bootstrap() {
     partialsDir: join(viewsPath, 'partials'),
     helpers: {
       eq: (a: unknown, b: unknown) => a == b,
+      // Показывать ли элементы управления фильмами/сеансами
+      isManager: (u: { role?: string } | null) =>
+        !!u && (u.role === 'MANAGER' || u.role === 'ADMIN'),
     },
   });
 

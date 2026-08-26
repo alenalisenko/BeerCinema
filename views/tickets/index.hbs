@@ -1,6 +1,6 @@
 <div class="page-head">
     <h2>Билеты</h2>
-    <a href="/tickets/add" class="btn">+ Добавить билет</a>
+    {{#if user}}<a href="/tickets/add" class="btn">+ Добавить билет</a>{{/if}}
 </div>
 
 {{#if tickets.length}}
@@ -29,7 +29,7 @@
                 <td>
                     <div class="row-actions">
                         <a href="/tickets/{{id}}">Подробнее</a>
-                        <a href="/tickets/{{id}}/edit" class="secondary">Статус</a>
+                        {{#if ../user}}<a href="/tickets/{{id}}/edit" class="secondary">Статус</a>{{/if}}
                     </div>
                 </td>
             </tr>
@@ -38,5 +38,5 @@
     </table>
 </div>
 {{else}}
-<div class="empty-state">Билетов пока нет. <a href="/tickets/add">Добавить первый</a></div>
+<div class="empty-state">Билетов пока нет.{{#if user}} <a href="/tickets/add">Добавить первый</a>{{/if}}</div>
 {{/if}}

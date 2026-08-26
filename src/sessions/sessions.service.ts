@@ -86,6 +86,24 @@ export class SessionsService {
     });
   }
 
+  // Ближайшие будущие сеансы; если будущих нет, показываем последние прошедшие,
+  // чтобы афиша на главной не была пустой
+  async findUpcoming(limit = 8) {
+    const upcoming = await this.prisma.session.findMany({
+      where: { startTime: { gte: new Date() } },
+      include: { film: true, hall: true },
+      orderBy: { startTime: 'asc' },
+      take: limit,
+    });
+    if (upcoming.length > 0) return upcoming;
+
+    return this.prisma.session.findMany({
+      include: { film: true, hall: true },
+      orderBy: { startTime: 'desc' },
+      take: limit,
+    });
+  }
+
   async create(data: {
     filmId: number;
     hallId: number;

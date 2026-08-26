@@ -25,12 +25,14 @@
             <span class="badge {{#if (eq ticket.status 'PAID')}}badge-green{{/if}}{{#if (eq ticket.status 'RESERVED')}}badge-amber{{/if}}{{#if (eq ticket.status 'CANCELLED')}}badge-red{{/if}}">{{ticket.status}}</span>
         </div>
     </div>
+    {{#if user}}
     <div class="form-actions">
         <a href="/tickets/{{ticket.id}}/edit" class="btn">Изменить статус</a>
         <form method="POST" action="/tickets/{{ticket.id}}/delete" onsubmit="return confirm('Удалить билет?')">
             <button type="submit" class="btn btn-danger">Удалить</button>
         </form>
     </div>
+    {{/if}}
 </div>
 {{else}}
 <div class="empty-state">Билет не найден.</div>
