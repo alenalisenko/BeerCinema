@@ -15,8 +15,8 @@
 /* Swiper buttons */
 .swiper-button-next,
 .swiper-button-prev {
-    color: #facc15 !important;
-    background: rgba(255, 255, 255, 0.9);
+    color: #f0b429 !important;
+    background: rgba(26, 23, 18, 0.9);
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -34,7 +34,7 @@
 }
 
 .swiper-pagination-bullet-active {
-    background: #facc15 !important;
+    background: #f0b429 !important;
     width: 24px;
     border-radius: 5px;
 }

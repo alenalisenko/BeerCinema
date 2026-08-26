@@ -1,56 +1,53 @@
-<div class="mb-4">
-    <a href="/films/{{film.id}}" class="text-yellow-500 hover:underline">← Назад к фильму</a>
-</div>
+<a href="/films/{{film.id}}" class="back-link">← Назад к фильму</a>
 
-<div class="bg-white shadow rounded-lg p-6 max-w-2xl mx-auto">
-    <h2 class="text-2xl font-bold mb-6">Редактировать фильм</h2>
+<div class="card form-card">
+    <h2 class="mb-6">Редактировать фильм</h2>
 
     {{#if film}}
     <form method="POST" action="/films/{{film.id}}/update" enctype="multipart/form-data">
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Название</label>
-            <input type="text" name="title" value="{{film.title}}" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+        <div class="field">
+            <label>Название</label>
+            <input type="text" name="title" value="{{film.title}}">
         </div>
-        <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Описание</label>
-            <textarea name="description" rows="4" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">{{film.description}}</textarea>
+        <div class="field">
+            <label>Описание</label>
+            <textarea name="description" rows="4">{{film.description}}</textarea>
         </div>
-        <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="form-row2 field">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Длительность (мин)</label>
-                <input type="number" name="duration" value="{{film.duration}}" min="1" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                <label>Длительность (мин)</label>
+                <input type="number" name="duration" value="{{film.duration}}" min="1">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Год выпуска</label>
-                <input type="number" name="releaseYear" value="{{film.releaseYear}}" min="1900" max="2100" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                <label>Год выпуска</label>
+                <input type="number" name="releaseYear" value="{{film.releaseYear}}" min="1900" max="2100">
             </div>
         </div>
-        <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="form-row2 field">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Жанр</label>
-                <input type="text" name="genre" value="{{film.genre}}" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                <label>Жанр</label>
+                <input type="text" name="genre" value="{{film.genre}}">
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Рейтинг (1.0–5.0)</label>
-                <input type="number" name="rating" value="{{film.rating}}" min="1" max="5" step="0.1" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                <label>Рейтинг (1.0–5.0)</label>
+                <input type="number" name="rating" value="{{film.rating}}" min="1" max="5" step="0.1">
             </div>
         </div>
-        <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Постер</label>
+        <div class="field">
+            <label>Постер</label>
             {{#if film.posterUrl}}
-            <img src="{{film.posterUrl}}" alt="Текущий постер" class="h-24 rounded mb-2 object-cover">
+            <img src="{{film.posterUrl}}" alt="Текущий постер" style="height: 110px; border-radius: 10px; margin-bottom: 10px;">
             {{/if}}
-            <input type="file" name="poster" accept="image/jpeg,image/png,image/webp"
-                class="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:bg-yellow-100 file:text-yellow-700">
-            <p class="text-xs text-gray-400 mt-1">или оставьте/измените URL вручную:</p>
-            <input type="text" name="posterUrl" value="{{film.posterUrl}}" class="w-full border rounded px-3 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            <input type="file" name="poster" accept="image/jpeg,image/png,image/webp">
+            <p class="hint">или оставьте/измените URL вручную:</p>
+            <input type="text" name="posterUrl" value="{{film.posterUrl}}" style="margin-top: 6px;">
         </div>
-        <div class="flex gap-3">
-            <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-6 rounded">Сохранить</button>
-            <a href="/films/{{film.id}}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-6 rounded">Отмена</a>
+        <div class="form-actions">
+            <button type="submit" class="btn">Сохранить</button>
+            <a href="/films/{{film.id}}" class="btn btn-ghost">Отмена</a>
         </div>
     </form>
     {{else}}
-    <p class="text-gray-500">Фильм не найден.</p>
+    <p class="muted">Фильм не найден.</p>
     {{/if}}
 </div>

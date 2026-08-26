@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .slice(0, maxMovies);
 
         const output = document.getElementById('schedule-output');
+        output.className = 'table-card mt-6';
 
         while (output.firstChild) {
             output.removeChild(output.firstChild);
@@ -51,18 +52,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (filteredMovies.length > 0) {
             const paragraph = document.createElement('p');
+            paragraph.style.padding = '16px 18px 0';
             paragraph.textContent = `Расписание с ${startTime} до ${endTime} на ${maxMovies} фильмов:`;
             output.appendChild(paragraph);
 
             const table = document.createElement('table');
-            table.className = "min-w-full bg-white shadow-md rounded-lg";
+            table.className = "";
 
             const thead = document.createElement('thead');
             const headerRow = document.createElement('tr');
 
             ["Фильм", "Время", "Зал"].forEach(text => {
                 const th = document.createElement('th');
-                th.className = "py-3 px-4 text-center bg-yellow-400";
+                th.className = "";
                 th.textContent = text;
                 headerRow.appendChild(th);
             });
@@ -74,11 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             filteredMovies.forEach((movie, index) => {
                 const row = document.createElement('tr');
-                row.className = index % 2 === 0 ? 'bg-gray-50' : 'hover:bg-gray-100';
+                row.className = '';
 
                 [movie.title, movie.time, movie.category].forEach(text => {
                     const td = document.createElement('td');
-                    td.className = "py-3 px-4 text-center";
+                    td.className = "";
                     td.textContent = text;
                     row.appendChild(td);
                 });
@@ -91,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             const noMoviesParagraph = document.createElement('p');
             noMoviesParagraph.textContent = 'Нет фильмов, подходящих под заданные критерии.';
+            noMoviesParagraph.style.padding = '16px 18px';
             output.appendChild(noMoviesParagraph);
         }
     });

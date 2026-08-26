@@ -1,27 +1,24 @@
-<div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold">Отзывы</h2>
-    <a href="/reviews/add" class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded">+ Добавить отзыв</a>
+<div class="page-head">
+    <h2>Отзывы</h2>
+    <a href="/reviews/add" class="btn">+ Добавить отзыв</a>
 </div>
 
 {{#if reviews.length}}
-<div class="space-y-4">
-    {{#each reviews}}
-    <div class="bg-white shadow rounded-lg p-4 flex justify-between items-start">
-        <div class="flex-1">
-            <div class="flex items-center gap-3 mb-1">
-                <a href="/films/{{film.id}}" class="font-semibold text-yellow-600 hover:underline">{{film.title}}</a>
-                <span class="text-gray-400">·</span>
-                <span class="text-gray-600 text-sm">{{user.name}}</span>
-            </div>
-            <p class="text-gray-700 text-sm">{{comment}}</p>
-        </div>
-        <div class="flex items-center gap-3 ml-4">
-            <span class="text-yellow-500 font-bold text-lg">★ {{rating}}</span>
-            <a href="/reviews/{{id}}" class="text-yellow-500 hover:underline text-sm">Подробнее</a>
-        </div>
+{{#each reviews}}
+<div class="review-card">
+    <div style="flex: 1;">
+        <p style="margin: 0 0 4px;">
+            <a href="/films/{{film.id}}" class="kv-value">{{film.title}}</a>
+            <span class="muted"> · {{user.name}}</span>
+        </p>
+        <p class="muted" style="margin: 0; font-size: 0.92rem;">{{comment}}</p>
     </div>
-    {{/each}}
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <span class="rating">★ {{rating}}</span>
+        <a href="/reviews/{{id}}" style="font-size: 0.88rem;">Подробнее</a>
+    </div>
 </div>
+{{/each}}
 {{else}}
-<p class="text-gray-500 text-center py-12">Отзывов пока нет. <a href="/reviews/add" class="text-yellow-500 underline">Добавить первый</a></p>
+<div class="empty-state">Отзывов пока нет. <a href="/reviews/add">Добавить первый</a></div>
 {{/if}}

@@ -27,11 +27,15 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     const menuLinks = document.querySelectorAll(".menu-link");
-    const currentPath = window.location.pathname.split('/').pop();
+    const currentPath = window.location.pathname;
 
     menuLinks.forEach((link) => {
-        if (link.getAttribute("href") === currentPath) {
-            link.classList.add("text-white", "font-bold", "border-b-2", "border-white");
+        const href = link.getAttribute("href");
+        const isActive = href === "/"
+            ? currentPath === "/"
+            : currentPath === href || currentPath.startsWith(href + "/");
+        if (isActive) {
+            link.classList.add("active");
         }
     });
 });

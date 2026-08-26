@@ -1,47 +1,49 @@
-<div class="mb-4">
-    <a href="/users" class="text-yellow-500 hover:underline">← Все пользователи</a>
-</div>
+<a href="/users" class="back-link">← Все пользователи</a>
 
 {{#if userData}}
-<div class="bg-white shadow-lg rounded-lg p-6 mb-6">
-    <h2 class="text-2xl font-bold mb-4">{{userData.name}}</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+<div class="card mb-6">
+    <h2 class="mb-6">{{userData.name}}</h2>
+    <div class="kv-grid">
         <div>
-            <p class="text-sm text-gray-500">Email</p>
-            <p class="font-semibold">{{userData.email}}</p>
+            <p class="kv-label">Email</p>
+            <p class="kv-value">{{userData.email}}</p>
         </div>
         <div>
-            <p class="text-sm text-gray-500">Роль</p>
-            <p class="font-semibold">{{userData.role}}</p>
+            <p class="kv-label">Роль</p>
+            <p class="kv-value">
+                <span class="badge {{#if (eq userData.role 'ADMIN')}}badge-red{{/if}}{{#if (eq userData.role 'MANAGER')}}badge-blue{{/if}}{{#if (eq userData.role 'CLIENT')}}badge-gray{{/if}}">{{userData.role}}</span>
+            </p>
         </div>
     </div>
-    <div class="flex gap-3">
-        <a href="/users/{{userData.id}}/edit" class="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded">Редактировать</a>
+    <div class="form-actions">
+        <a href="/users/{{userData.id}}/edit" class="btn">Редактировать</a>
         <form method="POST" action="/users/{{userData.id}}/delete" onsubmit="return confirm('Удалить пользователя?')">
-            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Удалить</button>
+            <button type="submit" class="btn btn-danger">Удалить</button>
         </form>
     </div>
 </div>
 
 {{#if userData.tickets.length}}
-<h3 class="text-xl font-bold mb-4">Билеты</h3>
-<div class="bg-white shadow rounded-lg overflow-hidden mb-6">
-    <table class="min-w-full">
-        <thead class="bg-yellow-400 text-white">
+<h3>Билеты</h3>
+<div class="table-card mb-6">
+    <table>
+        <thead>
             <tr>
-                <th class="py-3 px-4 text-left">Фильм</th>
-                <th class="py-3 px-4 text-left">Место</th>
-                <th class="py-3 px-4 text-left">Статус</th>
-                <th class="py-3 px-4 text-left"></th>
+                <th>Фильм</th>
+                <th>Место</th>
+                <th>Статус</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             {{#each userData.tickets}}
-            <tr class="border-t hover:bg-gray-50">
-                <td class="py-3 px-4">{{session.film.title}}</td>
-                <td class="py-3 px-4 font-mono">{{seat}}</td>
-                <td class="py-3 px-4">{{status}}</td>
-                <td class="py-3 px-4"><a href="/tickets/{{id}}" class="text-yellow-500 hover:underline text-sm">Подробнее</a></td>
+            <tr>
+                <td>{{session.film.title}}</td>
+                <td class="mono">{{seat}}</td>
+                <td>
+                    <span class="badge {{#if (eq status 'PAID')}}badge-green{{/if}}{{#if (eq status 'RESERVED')}}badge-amber{{/if}}{{#if (eq status 'CANCELLED')}}badge-red{{/if}}">{{status}}</span>
+                </td>
+                <td><a href="/tickets/{{id}}">Подробнее</a></td>
             </tr>
             {{/each}}
         </tbody>
@@ -50,19 +52,17 @@
 {{/if}}
 
 {{#if userData.reviews.length}}
-<h3 class="text-xl font-bold mb-4">Отзывы</h3>
-<div class="space-y-3">
-    {{#each userData.reviews}}
-    <div class="bg-white shadow rounded-lg p-4 flex justify-between items-start">
-        <div>
-            <a href="/films/{{film.id}}" class="font-semibold text-yellow-500 hover:underline">{{film.title}}</a>
-            <p class="text-gray-600 text-sm mt-1">{{comment}}</p>
-        </div>
-        <span class="text-yellow-500 font-bold ml-4">★ {{rating}}</span>
+<h3>Отзывы</h3>
+{{#each userData.reviews}}
+<div class="review-card">
+    <div>
+        <a href="/films/{{film.id}}" class="kv-value">{{film.title}}</a>
+        <p class="muted" style="margin: 6px 0 0;">{{comment}}</p>
     </div>
-    {{/each}}
+    <span class="rating">★ {{rating}}</span>
 </div>
+{{/each}}
 {{/if}}
 {{else}}
-<p class="text-gray-500">Пользователь не найден.</p>
+<div class="empty-state">Пользователь не найден.</div>
 {{/if}}

@@ -1,10 +1,10 @@
 {{#if user}}
-    <div class="flex items-center space-x-4">
-        <span class="text-sm">Вы вошли как <strong>{{user.name}}</strong></span>
+    <div class="user-box">
+        <span class="user-name">Вы вошли как <strong>{{user.name}}</strong></span>
         <form method="POST" action="/logout">
-            <button type="submit" class="bg-orange-500 hover:bg-orange-600 rounded px-4 py-2">Выход</button>
+            <button type="submit" class="btn btn-ghost btn-sm">Выход</button>
         </form>
     </div>
 {{else}}
-    <a href="/login" class="bg-orange-500 hover:bg-orange-600 rounded px-4 py-2 inline-block">Вход</a>
+    <a href="/login" class="btn btn-sm">Вход</a>
 {{/if}}

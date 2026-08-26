@@ -1,57 +1,53 @@
-<h2 class="text-center text-3xl font-bold mt-8">Добро пожаловать в BeerCinema!</h2>
-<p class="text-center text-lg mt-2">Удобная система бронирования билетов на лучшие фильмы</p>
+<section class="hero">
+    <h1>Добро пожаловать в <span class="gold">BeerCinema</span></h1>
+    <p>Удобная система бронирования билетов на лучшие фильмы</p>
+    <a href="#schedule" class="btn">Посмотреть расписание</a>
+</section>
 
-<div class="flex justify-center mt-6">
-    <button class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded-full">
-        <a href="#schedule">Посмотреть расписание</a>
-    </button>
-</div>
+<section class="mt-6">
+    <h3 class="section-h">Ближайшие показы</h3>
 
-<section class="mt-10 mb-12">
-    <h3 class="text-2xl font-bold text-center text-white bg-yellow-400 p-4 rounded-lg">Ближайшие показы</h3>
-    
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
+    <div class="films-grid">
         {{#each films}}
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden transform transition hover:scale-105 hover:shadow-xl">
-            <img src="{{posterUrl}}" alt="{{title}}" class="w-full h-80 object-cover">
-            <div class="p-4 text-center">
-                <h3 class="text-lg font-bold mb-2">{{title}}</h3>
-                <p class="text-gray-600 text-sm mb-3">{{time}}</p>
-                <button class="bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-6 rounded-full w-full transition">
-                    Купить билет
-                </button>
+        <div class="film-card">
+            <div class="poster-wrap">
+                <img src="{{posterUrl}}" alt="{{title}}">
+            </div>
+            <div class="film-card-body">
+                <h3>{{title}}</h3>
+                {{#if time}}<p class="film-meta">Ближайший сеанс: {{time}}</p>{{/if}}
+                <div class="film-card-actions">
+                    <a href="/tickets/add" class="btn btn-sm">Купить билет</a>
+                </div>
             </div>
         </div>
         {{/each}}
     </div>
 </section>
 
-<section class="mt-10" id="schedule">
-
-    <h3 class="text-2xl font-bold text-center">Расписание сеансов</h3>
-    <div class="overflow-x-auto mt-6">
-        <table class="min-w-full bg-white shadow-md rounded-lg">
+<section id="schedule">
+    <h3 class="section-h">Расписание сеансов</h3>
+    <div class="table-card">
+        <table>
             <thead>
                 <tr>
-                    <th class="py-3 px-4 text-center bg-yellow-400">Фильм</th>
-                    <th class="py-3 px-4 text-center bg-yellow-400">Время</th>
-                    <th class="py-3 px-4 text-center bg-yellow-400">Зал</th>
+                    <th>Фильм</th>
+                    <th>Время</th>
+                    <th>Зал</th>
                 </tr>
             </thead>
             <tbody>
                 {{#each schedule}}
-                <tr class="hover:bg-gray-100">
-                    <td class="py-3 px-4 text-center">{{film}}</td>
-                    <td class="py-3 px-4 text-center">{{time}}</td>
-                    <td class="py-3 px-4 text-center">{{hall}}</td>
+                <tr>
+                    <td>{{film}}</td>
+                    <td>{{time}}</td>
+                    <td>{{hall}}</td>
                 </tr>
                 {{/each}}
             </tbody>
         </table>
     </div>
-    <div class="flex justify-center mt-6">
-        <a href="/sessions" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-4 rounded-full">
-            Полное расписание
-        </a>
+    <div class="center-row">
+        <a href="/sessions" class="btn btn-ghost">Полное расписание</a>
     </div>
 </section>

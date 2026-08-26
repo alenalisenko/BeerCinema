@@ -1,34 +1,30 @@
-<div class="mb-4">
-    <a href="/reviews" class="text-yellow-500 hover:underline">← Все отзывы</a>
-</div>
+<a href="/reviews" class="back-link">← Все отзывы</a>
 
 {{#if review}}
-<div class="bg-white shadow-lg rounded-lg p-6 max-w-2xl mx-auto">
-    <div class="flex justify-between items-start mb-4">
-        <h2 class="text-2xl font-bold">Отзыв #{{review.id}}</h2>
-        <span class="text-3xl text-yellow-500 font-bold">★ {{review.rating}}</span>
+<div class="card form-card">
+    <div class="page-head" style="margin-bottom: 16px;">
+        <h2 style="margin: 0;">Отзыв #{{review.id}}</h2>
+        <span class="rating rating-lg">★ {{review.rating}}</span>
     </div>
-    <div class="space-y-3 mb-6">
-        <div>
-            <p class="text-sm text-gray-500">Фильм</p>
-            <a href="/films/{{review.film.id}}" class="font-semibold text-yellow-500 hover:underline">{{review.film.title}}</a>
+    <div class="mb-6">
+        <div class="split-row">
+            <span class="kv-label">Фильм</span>
+            <a href="/films/{{review.film.id}}" class="kv-value">{{review.film.title}}</a>
         </div>
-        <div>
-            <p class="text-sm text-gray-500">Автор</p>
-            <a href="/users/{{review.user.id}}" class="font-semibold text-yellow-500 hover:underline">{{review.user.name}}</a>
-        </div>
-        <div>
-            <p class="text-sm text-gray-500">Комментарий</p>
-            <p class="text-gray-700">{{review.comment}}</p>
+        <div class="split-row">
+            <span class="kv-label">Автор</span>
+            <a href="/users/{{review.user.id}}" class="kv-value">{{review.user.name}}</a>
         </div>
     </div>
-    <div class="flex gap-3">
-        <a href="/reviews/{{review.id}}/edit" class="bg-yellow-400 hover:bg-yellow-500 text-white py-2 px-4 rounded">Редактировать</a>
+    <p class="kv-label">Комментарий</p>
+    <p>{{review.comment}}</p>
+    <div class="form-actions">
+        <a href="/reviews/{{review.id}}/edit" class="btn">Редактировать</a>
         <form method="POST" action="/reviews/{{review.id}}/delete" onsubmit="return confirm('Удалить отзыв?')">
-            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded">Удалить</button>
+            <button type="submit" class="btn btn-danger">Удалить</button>
         </form>
     </div>
 </div>
 {{else}}
-<p class="text-gray-500">Отзыв не найден.</p>
+<div class="empty-state">Отзыв не найден.</div>
 {{/if}}

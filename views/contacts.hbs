@@ -1,49 +1,50 @@
-<section class="mt-10">
-    <h3 class="text-2xl font-bold text-center">Контакты</h3>
-    <div class="mt-6 text-lg text-gray-700">
-        <p>Если у вас возникли вопросы или вы хотите узнать больше о наших услугах, не стесняйтесь связаться с нами! Мы всегда рады помочь.</p>
+<section>
+    <h3 class="section-h">Контакты</h3>
+    <p class="text-center muted">Если у вас возникли вопросы или вы хотите узнать больше о наших услугах, не стесняйтесь связаться с нами! Мы всегда рады помочь.</p>
+</section>
+
+<section class="mt-6">
+    <div class="card">
+        <div class="kv-grid">
+            <div>
+                <p class="kv-label">Адрес</p>
+                <p class="kv-value">г. Москва, ул. Примерная, д. 10, Бизнес-центр «Кино», 5 этаж</p>
+            </div>
+            <div>
+                <p class="kv-label">Телефон</p>
+                <p class="kv-value">+7 (912) 345-67-89</p>
+            </div>
+            <div>
+                <p class="kv-label">Электронная почта</p>
+                <p class="kv-value"><a href="mailto:info@beercinema.ru">info@beercinema.ru</a></p>
+            </div>
+            <div>
+                <p class="kv-label">Часы работы</p>
+                <p class="kv-value">Ежедневно с 10:00 до 23:00</p>
+            </div>
+        </div>
     </div>
 </section>
 
-<section class="mt-10">
-    <h4 class="text-xl font-bold text-center">Наши контакты</h4>
-    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div>
-            <h5 class="font-semibold">Адрес:</h5>
-            <p>г. Москва, ул. Примерная, д. 10, Бизнес-центр "Кино", 5 этаж</p>
-        </div>
-        <div>
-            <h5 class="font-semibold">Телефон:</h5>
-            <p>+7 (912) 345-67-89</p>
-        </div>
-        <div>
-            <h5 class="font-semibold">Электронная почта:</h5>
-            <p><a href="mailto:info@beercinema.ru" class="text-yellow-400 hover:text-yellow-500">info@beercinema.ru</a></p>
-        </div>
-        <div>
-            <h5 class="font-semibold">Часы работы:</h5>
-            <p>Ежедневно с 10:00 до 23:00</p>
-        </div>
+<section class="mt-6">
+    <h4 class="section-h">Свяжитесь с нами</h4>
+    <div class="card form-card">
+        <form action="#" method="POST">
+            <div class="field">
+                <label for="name">Ваше имя</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="field">
+                <label for="email">Ваш email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="field">
+                <label for="message">Сообщение</label>
+                <textarea id="message" name="message" rows="4" required></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-block">Отправить</button>
+            </div>
+        </form>
     </div>
-</section>
-
-<section class="mt-10">
-    <h4 class="text-xl font-bold text-center">Свяжитесь с нами</h4>
-    <form action="#" method="POST" class="mt-6 grid grid-cols-1 gap-4">
-        <div>
-            <label for="name" class="block font-semibold">Ваше имя</label>
-            <input type="text" id="name" name="name" required class="w-full p-3 border border-gray-300 rounded-md">
-        </div>
-        <div>
-            <label for="email" class="block font-semibold">Ваш email</label>
-            <input type="email" id="email" name="email" required class="w-full p-3 border border-gray-300 rounded-md">
-        </div>
-        <div>
-            <label for="message" class="block font-semibold">Сообщение</label>
-            <textarea id="message" name="message" rows="4" required class="w-full p-3 border border-gray-300 rounded-md"></textarea>
-        </div>
-        <div class="flex justify-center mt-4">
-            <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-white font-bold py-2 px-6 rounded-full">Отправить</button>
-        </div>
-    </form>
 </section>
