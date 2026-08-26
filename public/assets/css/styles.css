@@ -1,11 +1,11 @@
-/* Swiper container */
+/* Swiper container: overflow hidden обязателен, иначе видны соседние слайды */
 .swiper-container {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
-    padding: 20px 60px;
+    padding: 6px 0 4px;
     position: relative;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .swiper-slide {
