@@ -1,31 +1,39 @@
-<a href="/tickets" class="back-link">← Все билеты</a>
+<a href="/tickets" class="back-link">← Мои билеты</a>
 
 <div class="card form-card">
-    <h2 class="mb-6">Добавить билет</h2>
+    <h2 class="mb-6">Покупка билета</h2>
+
+    {{#if error}}
+    <div class="form-error">{{error}}</div>
+    {{/if}}
 
     <form method="POST" action="/tickets">
         <div class="field">
             <label>Сеанс *</label>
-            <select name="sessionId" required>
+            <select name="sessionId" id="session-select" required>
                 <option value="">— выберите сеанс —</option>
                 {{#each sessions}}
-                <option value="{{id}}">{{film.title}} · {{hall.name}} · {{startTime}}</option>
+                <option value="{{id}}" {{#if (eq id ../selectedSessionId)}}selected{{/if}}>{{film.title}} · {{hall.name}} · {{startTimeFormatted}} · {{price}} ₽</option>
                 {{/each}}
             </select>
         </div>
+        {{#if (isManager user)}}
         <div class="field">
-            <label>Пользователь *</label>
-            <select name="userId" required>
-                <option value="">— выберите пользователя —</option>
+            <label>Пользователь (для менеджера; по умолчанию — вы)</label>
+            <select name="userId">
+                <option value="">— я ({{user.name}}) —</option>
                 {{#each users}}
                 <option value="{{id}}">{{name}} ({{email}})</option>
                 {{/each}}
             </select>
         </div>
+        {{/if}}
         <div class="field">
             <label>Место * (например: A1, B12)</label>
-            <input type="text" name="seat" required placeholder="A1">
+            <input type="text" name="seat" required placeholder="A1" value="{{seat}}">
+            <p class="hint" id="taken-seats"></p>
         </div>
+        {{#if (isManager user)}}
         <div class="field">
             <label>Статус</label>
             <select name="status">
@@ -34,9 +42,40 @@
                 <option value="CANCELLED">CANCELLED — отменён</option>
             </select>
         </div>
+        {{/if}}
         <div class="form-actions">
-            <button type="submit" class="btn">Добавить</button>
+            <button type="submit" class="btn">Купить</button>
             <a href="/tickets" class="btn btn-ghost">Отмена</a>
         </div>
     </form>
 </div>
+
+<script>
+// Подсказка занятых мест: при выборе сеанса тянем его билеты из REST API
+(function () {
+    const select = document.getElementById('session-select');
+    const hint = document.getElementById('taken-seats');
+
+    async function loadTakenSeats() {
+        const sessionId = select.value;
+        if (!sessionId) { hint.textContent = ''; return; }
+        try {
+            const res = await fetch('/api/sessions/' + sessionId + '/tickets');
+            if (!res.ok) { hint.textContent = ''; return; }
+            const tickets = await res.json();
+            const taken = tickets
+                .filter(t => t.status !== 'CANCELLED')
+                .map(t => t.seat)
+                .sort();
+            hint.textContent = taken.length
+                ? 'Занятые места: ' + taken.join(', ')
+                : 'Все места свободны';
+        } catch {
+            hint.textContent = '';
+        }
+    }
+
+    select.addEventListener('change', loadTakenSeats);
+    loadTakenSeats();
+})();
+</script>

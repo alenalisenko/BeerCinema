@@ -61,6 +61,13 @@ export class TicketsService {
             hall: true,
           },
         },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -72,6 +79,12 @@ export class TicketsService {
     return this.prisma.ticket.findMany({
       where: { sessionId },
       include: {
+        session: {
+          include: {
+            film: true,
+            hall: true,
+          },
+        },
         user: {
           select: {
             id: true,

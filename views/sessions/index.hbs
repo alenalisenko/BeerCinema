@@ -28,7 +28,8 @@
                 <td>{{price}} ₽</td>
                 <td>
                     <div class="row-actions">
-                        <a href="/sessions/{{id}}">Подробнее</a>
+                        <a href="/tickets/add?sessionId={{id}}">Купить</a>
+                        <a href="/sessions/{{id}}" class="secondary">Подробнее</a>
                         {{#if (isManager ../user)}}<a href="/sessions/{{id}}/edit" class="secondary">Изменить</a>{{/if}}
                     </div>
                 </td>

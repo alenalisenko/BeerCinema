@@ -1,8 +1,14 @@
 <div class="page-head">
-    <h2>Билеты</h2>
-    {{#if user}}<a href="/tickets/add" class="btn">+ Добавить билет</a>{{/if}}
+    <h2>{{#if mineOnly}}Мои билеты{{else}}Билеты{{/if}}</h2>
+    {{#if user}}<a href="/tickets/add" class="btn">+ Купить билет</a>{{/if}}
 </div>
 
+{{#unless user}}
+<div class="empty-state">
+    <p>Войдите, чтобы видеть свои билеты и покупать новые.</p>
+    <a href="/login" class="btn">Войти</a>
+</div>
+{{else}}
 {{#if tickets.length}}
 <div class="table-card">
     <table>
@@ -10,8 +16,9 @@
             <tr>
                 <th>Фильм</th>
                 <th>Зал</th>
+                <th>Сеанс</th>
                 <th>Место</th>
-                <th>Пользователь</th>
+                {{#unless mineOnly}}<th>Пользователь</th>{{/unless}}
                 <th>Статус</th>
                 <th>Действия</th>
             </tr>
@@ -21,15 +28,16 @@
             <tr>
                 <td>{{session.film.title}}</td>
                 <td>{{session.hall.name}}</td>
+                <td>{{session.startTimeFormatted}}</td>
                 <td class="mono">{{seat}}</td>
-                <td>{{user.name}}</td>
+                {{#unless ../mineOnly}}<td>{{user.name}}</td>{{/unless}}
                 <td>
                     <span class="badge {{#if (eq status 'PAID')}}badge-green{{/if}}{{#if (eq status 'RESERVED')}}badge-amber{{/if}}{{#if (eq status 'CANCELLED')}}badge-red{{/if}}">{{status}}</span>
                 </td>
                 <td>
                     <div class="row-actions">
                         <a href="/tickets/{{id}}">Подробнее</a>
-                        {{#if ../user}}<a href="/tickets/{{id}}/edit" class="secondary">Статус</a>{{/if}}
+                        {{#if (isManager ../user)}}<a href="/tickets/{{id}}/edit" class="secondary">Статус</a>{{/if}}
                     </div>
                 </td>
             </tr>
@@ -38,5 +46,9 @@
     </table>
 </div>
 {{else}}
-<div class="empty-state">Билетов пока нет.{{#if user}} <a href="/tickets/add">Добавить первый</a>{{/if}}</div>
+<div class="empty-state">
+    <p>{{#if mineOnly}}У вас пока нет билетов.{{else}}Билетов пока нет.{{/if}}</p>
+    <a href="/tickets/add" class="btn">Купить первый</a>
+</div>
 {{/if}}
+{{/unless}}

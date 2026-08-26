@@ -1,4 +1,4 @@
-<a href="/tickets" class="back-link">← Все билеты</a>
+<a href="/tickets" class="back-link">← Мои билеты</a>
 
 {{#if ticket}}
 <div class="card form-card-sm form-card">
@@ -16,23 +16,35 @@
             <span class="kv-label">Место</span>
             <span class="kv-value mono">{{ticket.seat}}</span>
         </div>
+        {{#if (isManager user)}}
         <div class="split-row">
             <span class="kv-label">Пользователь</span>
             <a href="/users/{{ticket.user.id}}" class="kv-value">{{ticket.user.name}}</a>
         </div>
+        {{/if}}
         <div class="split-row">
             <span class="kv-label">Статус</span>
             <span class="badge {{#if (eq ticket.status 'PAID')}}badge-green{{/if}}{{#if (eq ticket.status 'RESERVED')}}badge-amber{{/if}}{{#if (eq ticket.status 'CANCELLED')}}badge-red{{/if}}">{{ticket.status}}</span>
         </div>
     </div>
-    {{#if user}}
     <div class="form-actions">
-        <a href="/tickets/{{ticket.id}}/edit" class="btn">Изменить статус</a>
+        {{#if (eq ticket.status 'RESERVED')}}
+        <form method="POST" action="/tickets/{{ticket.id}}/pay">
+            <button type="submit" class="btn">Оплатить</button>
+        </form>
+        {{/if}}
+        {{#unless (eq ticket.status 'CANCELLED')}}
+        <form method="POST" action="/tickets/{{ticket.id}}/cancel" onsubmit="return confirm('Отменить билет?')">
+            <button type="submit" class="btn btn-ghost">Отменить билет</button>
+        </form>
+        {{/unless}}
+        {{#if (isManager user)}}
+        <a href="/tickets/{{ticket.id}}/edit" class="btn btn-ghost">Изменить статус</a>
         <form method="POST" action="/tickets/{{ticket.id}}/delete" onsubmit="return confirm('Удалить билет?')">
             <button type="submit" class="btn btn-danger">Удалить</button>
         </form>
+        {{/if}}
     </div>
-    {{/if}}
 </div>
 {{else}}
 <div class="empty-state">Билет не найден.</div>

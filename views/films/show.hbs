@@ -41,7 +41,12 @@
                 <td>{{startTime}}</td>
                 <td>{{hall.name}}</td>
                 <td>{{price}} ₽</td>
-                <td><a href="/sessions/{{id}}">Подробнее</a></td>
+                <td>
+                    <div class="row-actions">
+                        <a href="/tickets/add?sessionId={{id}}" class="btn btn-sm">Купить билет</a>
+                        <a href="/sessions/{{id}}" class="secondary">Подробнее</a>
+                    </div>
+                </td>
             </tr>
             {{/each}}
         </tbody>

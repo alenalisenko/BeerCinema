@@ -23,6 +23,7 @@ export class AppController {
     const films = filmsFromDB.map(film => {
       const firstSession = film.sessions[0];
       return {
+        id: film.id,
         title: film.title,
         time: firstSession ? this.formatDate(firstSession.startTime) : '',
         posterUrl: film.posterUrl,

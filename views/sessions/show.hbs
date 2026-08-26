@@ -25,9 +25,12 @@
             <p class="kv-value rating">{{session.price}} ₽</p>
         </div>
     </div>
+    <div class="form-actions">
+        <a href="/tickets/add?sessionId={{session.id}}" class="btn">Купить билет</a>
+    </div>
     {{#if (isManager user)}}
     <div class="form-actions">
-        <a href="/sessions/{{session.id}}/edit" class="btn">Редактировать</a>
+        <a href="/sessions/{{session.id}}/edit" class="btn btn-ghost">Редактировать</a>
         <form method="POST" action="/sessions/{{session.id}}/delete" onsubmit="return confirm('Удалить сеанс?')">
             <button type="submit" class="btn btn-danger">Удалить</button>
         </form>
