@@ -17,6 +17,29 @@ export class AuthService {
     return { id: user.id, email: user.email, name: user.name, role: user.role };
   }
 
+  // Смена имени и пароля в своем профиле; для смены пароля нужен текущий
+  async updateProfile(
+    userId: number,
+    data: { name?: string; currentPassword?: string; newPassword?: string },
+  ): Promise<SessionUser> {
+    const updates: { name?: string; password?: string } = {};
+    if (data.name) updates.name = data.name;
+
+    if (data.newPassword) {
+      const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+      if (!data.currentPassword || !(await bcrypt.compare(data.currentPassword, user.password))) {
+        throw new UnauthorizedException('Текущий пароль указан неверно');
+      }
+      updates.password = await bcrypt.hash(data.newPassword, 10);
+    }
+
+    const updated = await this.prisma.user.update({
+      where: { id: userId },
+      data: updates,
+    });
+    return { id: updated.id, email: updated.email, name: updated.name, role: updated.role };
+  }
+
   // Регистрация всегда создает клиента, роли выдает администратор
   async register(data: { email: string; name: string; password: string }): Promise<SessionUser> {
     const user = await this.prisma.user.create({

@@ -3,6 +3,18 @@
     {{#if (isManager user)}}<a href="/films/add" class="btn">+ Добавить фильм</a>{{/if}}
 </div>
 
+<form method="GET" action="/films" class="filter-bar">
+    <input type="text" name="q" placeholder="Поиск по названию" value="{{q}}">
+    <select name="genre">
+        <option value="">Все жанры</option>
+        {{#each genres}}
+        <option value="{{this}}" {{#if (eq this ../genre)}}selected{{/if}}>{{this}}</option>
+        {{/each}}
+    </select>
+    <button type="submit" class="btn btn-sm">Найти</button>
+    {{#if q}}<a href="/films" class="btn btn-ghost btn-sm">Сбросить</a>{{else}}{{#if genre}}<a href="/films" class="btn btn-ghost btn-sm">Сбросить</a>{{/if}}{{/if}}
+</form>
+
 {{#if films.length}}
 <div class="films-grid">
     {{#each films}}
@@ -23,5 +35,5 @@
     {{/each}}
 </div>
 {{else}}
-<div class="empty-state">Фильмов пока нет.{{#if (isManager user)}} <a href="/films/add">Добавить первый</a>{{/if}}</div>
+<div class="empty-state">{{#if q}}По запросу «{{q}}» ничего не найдено.{{else}}Фильмов пока нет.{{#if (isManager user)}} <a href="/films/add">Добавить первый</a>{{/if}}{{/if}}</div>
 {{/if}}

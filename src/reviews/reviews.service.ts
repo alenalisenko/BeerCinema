@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -77,13 +77,34 @@ export class ReviewsService {
     });
   }
 
+  // Рейтинг фильма — среднее по всем его отзывам (одна цифра после запятой)
+  private async recalcFilmRating(filmId: number) {
+    const agg = await this.prisma.review.aggregate({
+      where: { filmId },
+      _avg: { rating: true },
+    });
+    const avg = agg._avg.rating;
+    await this.prisma.film.update({
+      where: { id: filmId },
+      data: { rating: avg === null ? null : Math.round(avg * 10) / 10 },
+    });
+  }
+
   async create(data: {
     filmId: number;
     userId: number;
     rating: number;
     comment: string;
   }) {
-    return this.prisma.review.create({
+    // Один пользователь — один отзыв на фильм
+    const existing = await this.prisma.review.findFirst({
+      where: { filmId: data.filmId, userId: data.userId },
+    });
+    if (existing) {
+      throw new BadRequestException('Вы уже оставляли отзыв на этот фильм');
+    }
+
+    const review = await this.prisma.review.create({
       data,
       include: {
         film: {
@@ -100,22 +121,28 @@ export class ReviewsService {
         },
       },
     });
+    await this.recalcFilmRating(data.filmId);
+    return review;
   }
 
   async update(id: number, data: Partial<{
     rating: number;
     comment: string;
   }>) {
-    return this.prisma.review.update({
+    const review = await this.prisma.review.update({
       where: { id },
       data,
     });
+    await this.recalcFilmRating(review.filmId);
+    return review;
   }
 
   async remove(id: number) {
-    return this.prisma.review.delete({
+    const review = await this.prisma.review.delete({
       where: { id },
     });
+    await this.recalcFilmRating(review.filmId);
+    return review;
   }
 
   async findOneOrFail(id: number) {

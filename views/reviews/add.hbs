@@ -3,35 +3,41 @@
 <div class="card form-card">
     <h2 class="mb-6">Добавить отзыв</h2>
 
+    {{#if error}}
+    <div class="form-error">{{error}}</div>
+    {{/if}}
+
     <form method="POST" action="/reviews">
         <div class="field">
             <label>Фильм *</label>
             <select name="filmId" required>
                 <option value="">— выберите фильм —</option>
                 {{#each films}}
-                <option value="{{id}}">{{title}}</option>
+                <option value="{{id}}" {{#if (eq id ../selectedFilmId)}}selected{{/if}}>{{title}}</option>
                 {{/each}}
             </select>
         </div>
+        {{#if (isManager user)}}
         <div class="field">
-            <label>Пользователь *</label>
-            <select name="userId" required>
-                <option value="">— выберите пользователя —</option>
+            <label>Автор (для менеджера; по умолчанию — вы)</label>
+            <select name="userId">
+                <option value="">— я ({{user.name}}) —</option>
                 {{#each users}}
                 <option value="{{id}}">{{name}}</option>
                 {{/each}}
             </select>
         </div>
+        {{/if}}
         <div class="field">
             <label>Оценка * (1–5)</label>
-            <input type="number" name="rating" required min="1" max="5">
+            <input type="number" name="rating" required min="1" max="5" value="{{rating}}">
         </div>
         <div class="field">
             <label>Комментарий *</label>
-            <textarea name="comment" required rows="4"></textarea>
+            <textarea name="comment" required rows="4">{{comment}}</textarea>
         </div>
         <div class="form-actions">
-            <button type="submit" class="btn">Добавить</button>
+            <button type="submit" class="btn">Опубликовать</button>
             <a href="/reviews" class="btn btn-ghost">Отмена</a>
         </div>
     </form>

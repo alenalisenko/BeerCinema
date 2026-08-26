@@ -1,6 +1,6 @@
 {{#if user}}
     <div class="user-box">
-        <span class="user-name">Вы вошли как <strong>{{user.name}}</strong></span>
+        <a href="/profile" class="user-name" title="Профиль">Вы вошли как <strong>{{user.name}}</strong></a>
         <form method="POST" action="/logout">
             <button type="submit" class="btn btn-ghost btn-sm">Выход</button>
         </form>

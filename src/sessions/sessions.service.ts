@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Subject } from 'rxjs';
 
@@ -15,8 +15,9 @@ export class SessionsService {
 
   constructor(private prisma: PrismaService) {}
 
-  async findAll() {
+  async findAll(upcomingOnly = false) {
     return this.prisma.session.findMany({
+      where: upcomingOnly ? { startTime: { gte: new Date() } } : undefined,
       include: {
         film: true,
         hall: true,
@@ -104,6 +105,32 @@ export class SessionsService {
     });
   }
 
+  // Валидация расписания: конец позже начала, зал в это время свободен
+  private async validateSchedule(
+    hallId: number,
+    startTime: Date,
+    endTime: Date,
+    excludeSessionId?: number,
+  ) {
+    if (endTime <= startTime) {
+      throw new BadRequestException('Время окончания должно быть позже времени начала');
+    }
+    const overlapping = await this.prisma.session.findFirst({
+      where: {
+        hallId,
+        id: excludeSessionId ? { not: excludeSessionId } : undefined,
+        startTime: { lt: endTime },
+        endTime: { gt: startTime },
+      },
+      include: { film: true },
+    });
+    if (overlapping) {
+      throw new BadRequestException(
+        `Зал занят в это время: сеанс #${overlapping.id} «${overlapping.film.title}»`,
+      );
+    }
+  }
+
   async create(data: {
     filmId: number;
     hallId: number;
@@ -111,6 +138,7 @@ export class SessionsService {
     endTime: Date;
     price: number;
   }) {
+    await this.validateSchedule(data.hallId, data.startTime, data.endTime);
     const result = await this.prisma.session.create({
       data,
       include: { film: true, hall: true },
@@ -130,6 +158,13 @@ export class SessionsService {
     endTime: Date;
     price: number;
   }>) {
+    const current = await this.findOneOrFail(id);
+    await this.validateSchedule(
+      data.hallId ?? current.hallId,
+      data.startTime ?? current.startTime,
+      data.endTime ?? current.endTime,
+      id,
+    );
     const result = await this.prisma.session.update({
       where: { id },
       data,

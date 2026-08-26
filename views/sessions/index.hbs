@@ -3,6 +3,14 @@
     {{#if (isManager user)}}<a href="/sessions/add" class="btn">+ Добавить сеанс</a>{{/if}}
 </div>
 
+<div class="filter-bar">
+    {{#if showAll}}
+    <a href="/sessions" class="btn btn-ghost btn-sm">Только предстоящие</a>
+    {{else}}
+    <a href="/sessions?all=1" class="btn btn-ghost btn-sm">Показать все, включая прошедшие</a>
+    {{/if}}
+</div>
+
 <div id="sse-status" class="sse-status">● подключение к обновлениям...</div>
 
 {{#if sessions.length}}

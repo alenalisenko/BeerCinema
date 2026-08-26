@@ -3,6 +3,10 @@
 <div class="card form-card">
     <h2 class="mb-6">Редактировать сеанс</h2>
 
+    {{#if error}}
+    <div class="form-error">{{error}}</div>
+    {{/if}}
+
     {{#if session}}
     <form method="POST" action="/sessions/{{session.id}}/update">
         <div class="field">

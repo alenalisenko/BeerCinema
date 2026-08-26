@@ -124,9 +124,17 @@ async function main() {
   const hallBaltika = await prisma.hall.findUnique({ where: { name: 'Балтика' } });
   const hallBeer = await prisma.hall.findUnique({ where: { name: 'Разливное пиво' } });
 
-  // 5. Создаем сеансы
+  // 5. Создаем сеансы: раскладываем по ближайшим дням, чтобы афиша была живой
   const today = new Date();
+  today.setDate(today.getDate() + 1);
   today.setHours(12, 0, 0, 0);
+
+  const onDay = (offsetDays: number, hours: number, minutes: number) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + offsetDays);
+    d.setHours(hours, minutes, 0, 0);
+    return d;
+  };
 
   // Сеанс 1: 100 лет тому вперед в ЗОЖ
   const session1 = await prisma.session.create({
@@ -140,8 +148,7 @@ async function main() {
   });
 
   // Сеанс 2: Брат 2 в Балтике
-  const time2 = new Date(today);
-  time2.setHours(12, 15, 0, 0);
+  const time2 = onDay(0, 12, 15);
   const session2 = await prisma.session.create({
     data: {
       filmId: film2.id,
@@ -153,8 +160,7 @@ async function main() {
   });
 
   // Сеанс 3: 12 друзей Оушена в Разливное пиво
-  const time3 = new Date(today);
-  time3.setHours(12, 45, 0, 0);
+  const time3 = onDay(1, 12, 45);
   const session3 = await prisma.session.create({
     data: {
       filmId: film7.id,
@@ -166,8 +172,7 @@ async function main() {
   });
 
   // Сеанс 4: Головоломка 2 в ЗОЖ
-  const time4 = new Date(today);
-  time4.setHours(14, 5, 0, 0);
+  const time4 = onDay(1, 14, 5);
   const session4 = await prisma.session.create({
     data: {
       filmId: film3.id,
@@ -179,8 +184,7 @@ async function main() {
   });
 
   // Сеанс 5: Каскадеры в Балтике
-  const time5 = new Date(today);
-  time5.setHours(14, 30, 0, 0);
+  const time5 = onDay(2, 14, 30);
   const session5 = await prisma.session.create({
     data: {
       filmId: film6.id,
@@ -192,8 +196,7 @@ async function main() {
   });
 
   // Сеанс 6: Леон в Разливное пиво
-  const time6 = new Date(today);
-  time6.setHours(14, 50, 0, 0);
+  const time6 = onDay(2, 14, 50);
   const session6 = await prisma.session.create({
     data: {
       filmId: film4.id,
@@ -205,8 +208,7 @@ async function main() {
   });
 
   // Сеанс 7: Серебряные коньки в ЗОЖ
-  const time7 = new Date(today);
-  time7.setHours(16, 0, 0, 0);
+  const time7 = onDay(3, 16, 0);
   const session7 = await prisma.session.create({
     data: {
       filmId: film5.id,

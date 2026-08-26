@@ -3,13 +3,17 @@
 <div class="card form-card">
     <h2 class="mb-6">Добавить сеанс</h2>
 
+    {{#if error}}
+    <div class="form-error">{{error}}</div>
+    {{/if}}
+
     <form method="POST" action="/sessions">
         <div class="field">
             <label>Фильм *</label>
             <select name="filmId" required>
                 <option value="">— выберите фильм —</option>
                 {{#each films}}
-                <option value="{{id}}">{{title}}</option>
+                <option value="{{id}}" {{#if (eq id ../form.filmId)}}selected{{/if}}>{{title}}</option>
                 {{/each}}
             </select>
         </div>
@@ -18,23 +22,23 @@
             <select name="hallId" required>
                 <option value="">— выберите зал —</option>
                 {{#each halls}}
-                <option value="{{id}}">{{name}} ({{capacity}} мест)</option>
+                <option value="{{id}}" {{#if (eq id ../form.hallId)}}selected{{/if}}>{{name}} ({{capacity}} мест)</option>
                 {{/each}}
             </select>
         </div>
         <div class="form-row2 field">
             <div>
                 <label>Начало *</label>
-                <input type="datetime-local" name="startTime" required>
+                <input type="datetime-local" name="startTime" required value="{{form.startTime}}">
             </div>
             <div>
                 <label>Конец *</label>
-                <input type="datetime-local" name="endTime" required>
+                <input type="datetime-local" name="endTime" required value="{{form.endTime}}">
             </div>
         </div>
         <div class="field">
             <label>Цена билета (₽) *</label>
-            <input type="number" name="price" required min="0" step="0.01">
+            <input type="number" name="price" required min="0" step="0.01" value="{{form.price}}">
         </div>
         <div class="form-actions">
             <button type="submit" class="btn">Добавить</button>

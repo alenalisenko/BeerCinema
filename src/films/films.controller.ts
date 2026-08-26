@@ -1,5 +1,5 @@
 import 'multer';
-import { Controller, Get, Post, Param, Body, ParseIntPipe, Render, Redirect, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, UseGuards, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilmsService } from './films.service';
@@ -20,9 +20,14 @@ export class FilmsController {
   // GET /films — список фильмов
   @Get()
   @Render('films/index')
-  async index(@CurrentUser() user: SessionUser | null) {
-    const films = await this.filmsService.findAll();
-    return { title: 'Фильмы', user, films };
+  async index(
+    @CurrentUser() user: SessionUser | null,
+    @Query('q') q?: string,
+    @Query('genre') genre?: string,
+  ) {
+    const films = await this.filmsService.findAll({ q, genre });
+    const genres = await this.filmsService.findGenres();
+    return { title: 'Фильмы', user, films, genres, q, genre };
   }
 
   // GET /films/add — форма создания

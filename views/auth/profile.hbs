@@ -1,0 +1,39 @@
+<div class="card auth-card">
+    <h2>Профиль</h2>
+
+    {{#if error}}
+    <div class="form-error">{{error}}</div>
+    {{/if}}
+    {{#if success}}
+    <div class="note-box" style="border-color: rgba(74, 222, 128, 0.4); color: var(--green);">{{success}}</div>
+    {{/if}}
+
+    <div class="mb-6">
+        <div class="split-row">
+            <span class="kv-label">Email</span>
+            <span class="kv-value">{{user.email}}</span>
+        </div>
+        <div class="split-row">
+            <span class="kv-label">Роль</span>
+            <span class="badge {{#if (eq user.role 'ADMIN')}}badge-red{{/if}}{{#if (eq user.role 'MANAGER')}}badge-blue{{/if}}{{#if (eq user.role 'CLIENT')}}badge-gray{{/if}}">{{user.role}}</span>
+        </div>
+    </div>
+
+    <form method="POST" action="/profile">
+        <div class="field">
+            <label>Имя</label>
+            <input type="text" name="name" value="{{user.name}}" required>
+        </div>
+        <div class="field">
+            <label>Текущий пароль (для смены пароля)</label>
+            <input type="password" name="currentPassword" autocomplete="current-password">
+        </div>
+        <div class="field">
+            <label>Новый пароль (оставьте пустым, чтобы не менять)</label>
+            <input type="password" name="newPassword" minlength="6" autocomplete="new-password">
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-block">Сохранить</button>
+        </div>
+    </form>
+</div>

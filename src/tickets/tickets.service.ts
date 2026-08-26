@@ -98,12 +98,48 @@ export class TicketsService {
     });
   }
 
+  // Сеанс существует, еще не начался, а места есть в схеме зала (ряды по 10)
+  private async validatePurchase(sessionId: number, seats: string[]) {
+    const session = await this.prisma.session.findUnique({
+      where: { id: sessionId },
+      include: { hall: true },
+    });
+    if (!session) {
+      throw new BadRequestException(`Сеанс #${sessionId} не найден`);
+    }
+    if (session.startTime < new Date()) {
+      throw new BadRequestException('Сеанс уже начался, билеты не продаются');
+    }
+
+    const seatsPerRow = 10;
+    const rows = Math.ceil(session.hall.capacity / seatsPerRow);
+    for (const seat of seats) {
+      const match = /^([A-Z])([0-9]{1,2})$/.exec(seat);
+      const rowIndex = match ? match[1].charCodeAt(0) - 65 : -1;
+      const num = match ? parseInt(match[2]) : 0;
+      const seatIndex = rowIndex * seatsPerRow + num - 1;
+      const valid =
+        match &&
+        rowIndex >= 0 && rowIndex < rows &&
+        num >= 1 && num <= seatsPerRow &&
+        seatIndex < session.hall.capacity;
+      if (!valid) {
+        throw new BadRequestException(
+          `Места ${seat} нет в зале «${session.hall.name}» (${session.hall.capacity} мест)`,
+        );
+      }
+    }
+    return session;
+  }
+
   async create(data: {
     sessionId: number;
     userId: number;
     seat: string;
     status?: TicketStatus;
   }) {
+    await this.validatePurchase(data.sessionId, [data.seat]);
+
     // Проверяем, что место еще не занято
     const existingTicket = await this.prisma.ticket.findUnique({
       where: {
@@ -138,6 +174,8 @@ export class TicketsService {
     seats: string[];
     status?: TicketStatus;
   }) {
+    await this.validatePurchase(data.sessionId, data.seats);
+
     const taken = await this.prisma.ticket.findMany({
       where: {
         sessionId: data.sessionId,

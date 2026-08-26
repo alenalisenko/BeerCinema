@@ -54,7 +54,6 @@
 </div>
 {{/if}}
 
-{{#if film.reviews.length}}
 <h3>Отзывы</h3>
 {{#each film.reviews}}
 <div class="review-card">
@@ -64,7 +63,39 @@
     </div>
     <span class="rating">★ {{rating}}</span>
 </div>
+{{else}}
+<p class="muted">Отзывов пока нет — станьте первым!</p>
 {{/each}}
+
+{{#if user}}
+<div class="card form-card mb-6" style="margin-top: 20px; margin-left: 0;">
+    <h4>Оставить отзыв</h4>
+    <form method="POST" action="/reviews">
+        <input type="hidden" name="filmId" value="{{film.id}}">
+        <input type="hidden" name="from" value="film">
+        <div class="form-row2 field">
+            <div>
+                <label>Оценка (1–5)</label>
+                <select name="rating" required>
+                    <option value="5">★★★★★ — 5</option>
+                    <option value="4">★★★★ — 4</option>
+                    <option value="3">★★★ — 3</option>
+                    <option value="2">★★ — 2</option>
+                    <option value="1">★ — 1</option>
+                </select>
+            </div>
+        </div>
+        <div class="field">
+            <label>Комментарий</label>
+            <textarea name="comment" required rows="3" placeholder="Поделитесь впечатлениями о фильме"></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn">Опубликовать</button>
+        </div>
+    </form>
+</div>
+{{else}}
+<p class="muted" style="margin-top: 16px;"><a href="/login">Войдите</a>, чтобы оставить отзыв.</p>
 {{/if}}
 {{else}}
 <div class="empty-state">Фильм не найден.</div>

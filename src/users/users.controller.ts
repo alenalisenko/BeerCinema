@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, UseGuards, ForbiddenException } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { Roles } from '../auth/roles.decorator';
@@ -78,7 +78,10 @@ export class UsersController {
   // POST /users/:id/delete — удалить + редирект на /users
   @Post(':id/delete')
   @Redirect('/users', 302)
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() user: SessionUser | null) {
+    if (user && user.id === id) {
+      throw new ForbiddenException('Нельзя удалить собственный аккаунт');
+    }
     await this.usersService.remove(id);
   }
 }

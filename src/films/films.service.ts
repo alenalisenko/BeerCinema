@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { StorageService } from '../storage/storage.service';
 
@@ -7,10 +9,20 @@ export class FilmsService {
   constructor(
     private prisma: PrismaService,
     private storageService: StorageService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
 
-  async findAll() {
-    return this.prisma.film.findMany({
+  // Сбрасываем серверный кэш списка фильмов после любой мутации,
+  // иначе GET /api/films отдает устаревшие данные до истечения TTL
+  private async invalidateCache() {
+    await this.cache.clear();
+  }
+
+  async findAll(filters?: { q?: string; genre?: string }) {
+    const films = await this.prisma.film.findMany({
+      where: {
+        genre: filters?.genre ? { equals: filters.genre } : undefined,
+      },
       include: {
         sessions: {
           include: {
@@ -38,6 +50,23 @@ export class FilmsService {
         title: 'asc',
       },
     });
+
+    // Поиск по подстроке фильтруем в JS: ILIKE в Postgres с C-локалью
+    // не понимает регистр кириллицы
+    if (filters?.q) {
+      const q = filters.q.toLowerCase();
+      return films.filter((f) => f.title.toLowerCase().includes(q));
+    }
+    return films;
+  }
+
+  async findGenres(): Promise<string[]> {
+    const rows = await this.prisma.film.findMany({
+      select: { genre: true },
+      distinct: ['genre'],
+      orderBy: { genre: 'asc' },
+    });
+    return rows.map((r) => r.genre);
   }
 
   async findOne(id: number) {
@@ -78,9 +107,11 @@ export class FilmsService {
     releaseYear: number;
     rating?: number;
   }) {
-    return this.prisma.film.create({
+    const film = await this.prisma.film.create({
       data: { ...data, posterUrl: data.posterUrl ?? '' },
     });
+    await this.invalidateCache();
+    return film;
   }
 
   async update(id: number, data: Partial<{
@@ -110,6 +141,7 @@ export class FilmsService {
       }
     }
 
+    await this.invalidateCache();
     return updatedFilm;
   }
 
@@ -127,6 +159,7 @@ export class FilmsService {
       }
     }
 
+    await this.invalidateCache();
     return deletedFilm;
   }
 
