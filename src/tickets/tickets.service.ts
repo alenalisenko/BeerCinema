@@ -131,6 +131,39 @@ export class TicketsService {
     });
   }
 
+  // Покупка нескольких мест одним заказом
+  async createMany(data: {
+    sessionId: number;
+    userId: number;
+    seats: string[];
+    status?: TicketStatus;
+  }) {
+    const taken = await this.prisma.ticket.findMany({
+      where: {
+        sessionId: data.sessionId,
+        seat: { in: data.seats },
+      },
+      select: { seat: true },
+    });
+    if (taken.length > 0) {
+      const seats = taken.map((t) => t.seat).join(', ');
+      throw new BadRequestException(`Уже забронированы места: ${seats}`);
+    }
+
+    return this.prisma.$transaction(
+      data.seats.map((seat) =>
+        this.prisma.ticket.create({
+          data: {
+            sessionId: data.sessionId,
+            userId: data.userId,
+            seat,
+            status: data.status ?? 'RESERVED',
+          },
+        }),
+      ),
+    );
+  }
+
   async updateStatus(id: number, status: TicketStatus) {
     return this.prisma.ticket.update({
       where: { id },

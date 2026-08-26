@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, Res, UseGuards, ForbiddenException, HttpException } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, ParseIntPipe, Render, Redirect, Res, UseGuards, BadRequestException, ForbiddenException, HttpException } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { TicketsService } from './tickets.service';
@@ -126,14 +126,22 @@ export class TicketsController {
     @Res() res: Response,
   ) {
     const manager = this.isManager(user);
+    // На схеме можно выбрать несколько мест, коды приходят через запятую
+    const seats: string[] = String(body.seat ?? '')
+      .split(',')
+      .map((s: string) => s.trim())
+      .filter(Boolean);
     try {
-      const ticket = await this.ticketsService.create({
+      if (seats.length === 0) {
+        throw new BadRequestException('Выберите хотя бы одно место');
+      }
+      const tickets = await this.ticketsService.createMany({
         sessionId: parseInt(body.sessionId),
         userId: manager && body.userId ? parseInt(body.userId) : user!.id,
-        seat: body.seat,
+        seats,
         status: manager ? (body.status as TicketStatus) || 'RESERVED' : 'RESERVED',
       });
-      return res.redirect(`/tickets/${ticket.id}`);
+      return res.redirect(tickets.length === 1 ? `/tickets/${tickets[0].id}` : '/tickets');
     } catch (e) {
       // Место занято или сеанс не найден: показываем форму с ошибкой
       const message = e instanceof HttpException ? e.message : 'Не удалось купить билет';

@@ -3,6 +3,12 @@
         <li><a href="/" class="menu-link nav-link">Главная</a></li>
         <li><a href="/films" class="menu-link nav-link">Фильмы</a></li>
         <li><a href="/sessions" class="menu-link nav-link">Сеансы</a></li>
+        {{#if user}}
+        <li><a href="/tickets" class="menu-link nav-link">{{#if (isManager user)}}Билеты{{else}}Мои билеты{{/if}}</a></li>
+        {{/if}}
+        {{#if (eq user.role 'ADMIN')}}
+        <li><a href="/users" class="menu-link nav-link">Пользователи</a></li>
+        {{/if}}
         <li><a href="/about" class="menu-link nav-link">О нас</a></li>
         <li><a href="/contacts" class="menu-link nav-link">Контакты</a></li>
         <li><a href="/constructor" class="menu-link nav-link">Конструктор</a></li>

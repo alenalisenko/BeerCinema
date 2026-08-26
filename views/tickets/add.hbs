@@ -29,8 +29,8 @@
         </div>
         {{/if}}
         <div class="field">
-            <label>Место *</label>
-            <input type="text" name="seat" id="seat-input" required placeholder="Выберите место на схеме" value="{{seat}}" readonly>
+            <label>Места * (можно выбрать несколько)</label>
+            <input type="text" name="seat" id="seat-input" required placeholder="Выберите места на схеме" value="{{seat}}" readonly>
             <div id="hall-scheme" class="hall-scheme" hidden>
                 <div class="screen-bar"></div>
                 <div class="screen-label">ЭКРАН</div>
@@ -62,7 +62,8 @@
 
 <script>
 // Схема зала: ряды по 10 мест исходя из вместимости зала (data-capacity),
-// занятые места подтягиваются из REST API выбранного сеанса
+// занятые места подтягиваются из REST API выбранного сеанса.
+// Кликом можно выбрать несколько мест, коды пишутся в поле через запятую.
 (function () {
     const SEATS_PER_ROW = 10;
     const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -72,6 +73,14 @@
     const scheme = document.getElementById('hall-scheme');
     const map = document.getElementById('seat-map');
     const hint = document.getElementById('scheme-hint');
+
+    let selected = new Set(
+        seatInput.value.split(',').map(s => s.trim()).filter(Boolean)
+    );
+
+    function syncInput() {
+        seatInput.value = Array.from(selected).join(', ');
+    }
 
     async function renderScheme() {
         const option = select.selectedOptions[0];
@@ -117,12 +126,18 @@
                 if (taken.includes(code)) {
                     seat.classList.add('taken');
                     seat.disabled = true;
+                    selected.delete(code);
                 } else {
-                    if (seatInput.value === code) seat.classList.add('selected');
+                    if (selected.has(code)) seat.classList.add('selected');
                     seat.addEventListener('click', () => {
-                        map.querySelectorAll('.seat.selected').forEach(el => el.classList.remove('selected'));
-                        seat.classList.add('selected');
-                        seatInput.value = code;
+                        if (selected.has(code)) {
+                            selected.delete(code);
+                            seat.classList.remove('selected');
+                        } else {
+                            selected.add(code);
+                            seat.classList.add('selected');
+                        }
+                        syncInput();
                     });
                 }
                 rowEl.appendChild(seat);
@@ -132,9 +147,10 @@
 
         scheme.hidden = false;
         hint.hidden = true;
+        syncInput();
     }
 
-    select.addEventListener('change', () => { seatInput.value = ''; renderScheme(); });
+    select.addEventListener('change', () => { selected.clear(); syncInput(); renderScheme(); });
     renderScheme();
 })();
 </script>
